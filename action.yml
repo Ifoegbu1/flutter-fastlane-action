@@ -90,7 +90,7 @@ runs:
           --flutter-version "${{ inputs.flutterVersion }}" \
           --build-name "${{ inputs.buildName }}" \
           --build-number "${{ inputs.buildNumber }}" \
-          --ios-secrets "${{ inputs.iosDistributionJson }}" \
+          --ios-secrets '${{ inputs.iosDistributionJson }}' \
           --platform "${{ inputs.platform }}" \
           --working-directory "${{ inputs.workingDirectory }}" \
           --shorebird-token "${{ inputs.shorebirdToken }}" \
@@ -99,10 +99,10 @@ runs:
           --android-key-store-password "${{ inputs.androidKeyStorePassword }}" \
           --android-key-store-alias "${{ inputs.androidKeyStoreAlias }}" \
           --android-key-password "${{ inputs.androidKeyPassword }}" \
-          --service-account-json "${{ inputs.serviceAccountJsonPlainText }}" \
           --package-name "${{ inputs.packageName }}" \
           --build-args-android "${{ inputs.androidBuildArgs }}" \
-          --build-args-ios "${{ inputs.iosBuildArgs }}"
+          --build-args-ios "${{ inputs.iosBuildArgs }}" \
+          --service-account-json '${{ inputs.serviceAccountJsonPlainText }}' 
 
     - name: Validate Required Inputs
       shell: bash

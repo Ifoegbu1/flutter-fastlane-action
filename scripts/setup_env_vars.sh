@@ -136,7 +136,6 @@ if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_SECRETS" ]; then
     fi
 fi
 
-# Also include package name for validation
 if [ -n "$SERVICE_ACCOUNT_JSON_PLAIN_TEXT" ]; then
     # Don't add service account JSON directly to environment - will be used directly in the action
     echo "hasServiceAccount=true" >>"$GITHUB_ENV"
