@@ -80,8 +80,8 @@ platform :ios do
           end
           
           # Add additional build arguments if available
-          if ENV["iosBuildArgs"]
-            flutter_args += " #{ENV["iosBuildArgs"]}"
+          if ENV["buildArgsIos"]
+            flutter_args += " #{ENV["buildArgsIos"]}"
           end
           
           shorebird_release(
@@ -103,8 +103,8 @@ platform :ios do
         end
         
         # Add additional build arguments if available
-        if ENV["iosBuildArgs"]
-          build_cmd += " #{ENV["iosBuildArgs"]}"
+        if ENV["buildArgsIos"]
+          build_cmd += " #{ENV["buildArgsIos"]}"
         end
         
         sh build_cmd

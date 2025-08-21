@@ -28,11 +28,16 @@ shorebird_update() {
     fi
 
     # Add additional build arguments if available
-    if [ -n "$androidBuildArgs" ]; then
-        flutter_args+=" $androidBuildArgs"
+    if [ -n "$buildArgsAndroid" ]; then
+        flutter_args+=" $buildArgsAndroid"
     fi
 
     shorebird release android --flutter-version=$flutterV -- $flutter_args
+
+    # Sign the AAB file if keystore is provided
+    if [ -n "$androidKeyStorePath" ] && [ -n "$androidKeyStorePassword" ] && [ -n "$androidKeyPassword" ] && [ -n "$androidKeyStoreAlias" ]; then
+        sign_aab "$androidKeyStorePath" "$androidKeyStorePassword" "$androidKeyPassword" "build/app/outputs/bundle/release/app-release.aab" "$androidKeyStoreAlias"
+    fi
 }
 
 flutter_build() {
@@ -48,11 +53,16 @@ flutter_build() {
     fi
 
     # Add additional build arguments if available
-    if [ -n "$androidBuildArgs" ]; then
-        build_args+=" $androidBuildArgs"
+    if [ -n "$buildArgsAndroid" ]; then
+        build_args+=" $buildArgsAndroid"
     fi
 
     flutter build appbundle $build_args
+
+    # Sign the AAB file if keystore is provided
+    if [ -n "$androidKeyStorePath" ] && [ -n "$androidKeyStorePassword" ] && [ -n "$androidKeyPassword" ] && [ -n "$androidKeyStoreAlias" ]; then
+        sign_aab "$androidKeyStorePath" "$androidKeyStorePassword" "$androidKeyPassword" "build/app/outputs/bundle/release/app-release.aab" "$androidKeyStoreAlias"
+    fi
 }
 
 sign_aab() {
@@ -81,10 +91,6 @@ build() {
         flutter_build
     fi
 
-    # Sign the AAB file if keystore is provided
-    if [ -n "$androidKeyStorePath" ] && [ -n "$androidKeyStorePassword" ] && [ -n "$androidKeyPassword" ] && [ -n "$androidKeyStoreAlias" ]; then
-        sign_aab "$androidKeyStorePath" "$androidKeyStorePassword" "$androidKeyPassword" "build/app/outputs/bundle/release/app-release.aab" "$androidKeyStoreAlias"
-    fi
 }
 
 main() {
