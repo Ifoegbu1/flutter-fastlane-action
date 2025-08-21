@@ -13,6 +13,14 @@ inputs:
   platform:
     description: "Target platform (ios/android)"
     required: true
+  androidBuildArgs:
+    description: "Build arguments to use for android"
+    required: false
+    default: ""
+  iosBuildArgs:
+    description: "Build arguments to use for ios"
+    required: false
+    default: ""
   buildNumber:
     description: "Build number to use"
     required: false
@@ -92,7 +100,9 @@ runs:
           "${{ inputs.androidKeyStoreAlias }}" \
           "${{ inputs.androidKeyPassword }}" \
           "${{ inputs.serviceAccountJsonPlainText }}" \
-          "${{ inputs.packageName }}"
+          "${{ inputs.packageName }}" \
+          "${{ inputs.androidBuildArgs }}" \
+          "${{ inputs.iosBuildArgs }}"
 
     - name: Validate Required Inputs
       shell: bash

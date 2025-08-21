@@ -9,6 +9,7 @@ A GitHub Action to build and deploy Flutter apps using Fastlane (for iOS) and Sh
 - Automated building and deployment to Google Play for Android
 - Optional Shorebird integration for patch releases
 - Configurable build parameters (version, build number)
+- Platform-specific build arguments for customizing builds
 
 ## Requirements
 
@@ -89,6 +90,8 @@ steps:
 | ----------------------------- | ----------------- | ---------- | -------------------------------------------------- |
 | `workingDirectory`            | No                | `.`        | Directory where your Flutter project is located    |
 | `platform`                    | Yes               | -          | Target platform (`ios` or `android`)               |
+| `androidBuildArgs`            | No                | -          | Additional build arguments for Android builds      |
+| `iosBuildArgs`                | No                | -          | Additional build arguments for iOS builds          |
 | `buildNumber`                 | No                | -          | Build number to use                                |
 | `buildName`                   | No                | -          | Build name/version to use                          |
 | `iosDistributionJson`         | Yes (for iOS)     | -          | JSON containing iOS distribution secrets           |
@@ -198,6 +201,7 @@ jobs:
           platform: "ios"
           buildNumber: ${{ github.run_number }}
           buildName: "1.0.0"
+          iosBuildArgs: "--no-sound-null-safety --dart-define=ENVIRONMENT=production"
           iosDistributionJson: ${{ secrets.IOS_DISTRIBUTION_JSON }}
 ```
 
@@ -223,6 +227,7 @@ jobs:
           platform: "android"
           buildNumber: ${{ github.run_number }}
           buildName: "1.0.0"
+          androidBuildArgs: "--no-sound-null-safety --dart-define=ENVIRONMENT=production"
           packageName: "com.example.app"
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           androidKeyStorePath: ${{ secrets.ANDROID_KEYSTORE_PATH }}
@@ -254,6 +259,9 @@ jobs:
           useShorebird: true
           isPatch: true
           shorebirdToken: ${{ secrets.SHOREBIRD_TOKEN }}
+          # Platform specific build args can be provided
+          androidBuildArgs: "--allow-asset-diffs" # If platform is android
+          # iosBuildArgs: "--allow-asset-diffs"    # If platform is ios
           # Other required parameters based on platform
 ```
 
@@ -272,4 +280,4 @@ See the [LICENSE](LICENSE) file for details.
 
 ## Author
 
-Charles Ifoegbu
+**Charles Ifoegbu**

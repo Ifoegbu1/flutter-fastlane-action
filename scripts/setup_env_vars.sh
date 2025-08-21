@@ -17,6 +17,9 @@ ANDROID_KEY_STORE_ALIAS="${12}"
 ANDROID_KEY_PASSWORD="${13}"
 SERVICE_ACCOUNT_JSON_PLAIN_TEXT="${14}"
 PACKAGE_NAME="${15}"
+ANDROID_BUILD_ARGS="${16}"
+IOS_BUILD_ARGS="${17}"
+
 yaml_file="pubspec.yaml"
 
 # Set environment variables
@@ -34,6 +37,8 @@ echo "androidKeyStorePath=$ANDROID_KEY_STORE_PATH" >>"$GITHUB_ENV"
 echo "androidKeyStorePassword=$ANDROID_KEY_STORE_PASSWORD" >>"$GITHUB_ENV"
 echo "androidKeyStoreAlias=$ANDROID_KEY_STORE_ALIAS" >>"$GITHUB_ENV"
 echo "androidKeyPassword=$ANDROID_KEY_PASSWORD" >>"$GITHUB_ENV"
+echo "androidBuildArgs=$ANDROID_BUILD_ARGS" >>"$GITHUB_ENV"
+echo "iosBuildArgs=$IOS_BUILD_ARGS" >>"$GITHUB_ENV"
 
 # Check if API key content is base64 encoded (for iOS)
 if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_SECRETS" ]; then

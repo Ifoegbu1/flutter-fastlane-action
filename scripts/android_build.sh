@@ -11,17 +11,48 @@ shorebird_build() {
 }
 shorebird_patch() {
     echo "🎯 SHOREBIRD PATCH OPERATION INITIATED."
-    shorebird patch --platforms=android --release-version="$releaseV" --allow-asset-diffs
+    build_args="--platforms=android --release-version=\"$releaseV\" --allow-asset-diffs"
+    shorebird patch "$build_args"
 }
 
 shorebird_update() {
     echo "🎯 SHOREBIRD UPDATE OPERATION INITIATED."
-    shorebird release android --flutter-version=$flutterV -- --no-tree-shake-icons --dart-define=ENVIRONMENT=$ENVIRONMENT --obfuscate --split-debug-info=build/
+    flutter_args="--no-tree-shake-icons --dart-define=ENVIRONMENT=$ENVIRONMENT --obfuscate --split-debug-info=build/"
+
+    # Add build-name and build-number if available
+    if [ -n "$buildName" ]; then
+        flutter_args+=" --build-name=$buildName"
+    fi
+    if [ -n "$buildNumber" ]; then
+        flutter_args+=" --build-number=$buildNumber"
+    fi
+
+    # Add additional build arguments if available
+    if [ -n "$androidBuildArgs" ]; then
+        flutter_args+=" $androidBuildArgs"
+    fi
+
+    shorebird release android --flutter-version=$flutterV -- $flutter_args
 }
 
 flutter_build() {
     echo "🐦 FLUTTER BUILD OPERATION INITIATED."
-    flutter build appbundle --obfuscate --split-debug-info=build/
+    build_args="--obfuscate --split-debug-info=build/"
+
+    # Add build-name and build-number if available
+    if [ -n "$buildName" ]; then
+        build_args+=" --build-name=$buildName"
+    fi
+    if [ -n "$buildNumber" ]; then
+        build_args+=" --build-number=$buildNumber"
+    fi
+
+    # Add additional build arguments if available
+    if [ -n "$androidBuildArgs" ]; then
+        build_args+=" $androidBuildArgs"
+    fi
+
+    flutter build appbundle $build_args
 }
 
 sign_aab() {

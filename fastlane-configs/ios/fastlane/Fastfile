@@ -61,18 +61,53 @@ platform :ios do
         sh "echo \"🐦 Shorebird action initiated\""
         if isPatch == "true"
           sh "echo \"🎯 Shorebird Patch action initiated\""
-          shorebird_patch(platform: "ios", args: "--release-version #{releaseV} --allow-asset-diffs")
+          patch_args = "--release-version #{releaseV} --allow-asset-diffs"
+          
+          # Add additional build arguments if available
+        
+          
+          shorebird_patch(platform: "ios", args: patch_args)
         else
           sh "echo \"🚀 Shorebird Release action initiated\""
+          flutter_args = "--no-tree-shake-icons"
+          
+          # Add build-name and build-number if available
+          if ENV["buildName"]
+            flutter_args += " --build-name=#{ENV["buildName"]}"
+          end
+          if ENV["buildNumber"]
+            flutter_args += " --build-number=#{ENV["buildNumber"]}"
+          end
+          
+          # Add additional build arguments if available
+          if ENV["iosBuildArgs"]
+            flutter_args += " #{ENV["iosBuildArgs"]}"
+          end
+          
           shorebird_release(
             platform: "ios", 
-            args: "--flutter-version #{flutterV} -- --no-tree-shake-icons",
+            args: "--flutter-version #{flutterV} -- #{flutter_args}",
             # verbose: true
           )
         end
       else
         sh "echo \"🚀 Building with Flutter version: #{flutterV}\""
-        sh "cd ../.. && flutter build ipa --release"
+        build_cmd = "cd ../.. && flutter build ipa --release"
+        
+        # Add build-name and build-number if available
+        if ENV["buildName"]
+          build_cmd += " --build-name=#{ENV["buildName"]}"
+        end
+        if ENV["buildNumber"]
+          build_cmd += " --build-number=#{ENV["buildNumber"]}"
+        end
+        
+        # Add additional build arguments if available
+        if ENV["iosBuildArgs"]
+          build_cmd += " #{ENV["iosBuildArgs"]}"
+        end
+        
+        sh build_cmd
       end
 
 
