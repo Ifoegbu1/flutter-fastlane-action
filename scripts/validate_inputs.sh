@@ -95,6 +95,20 @@ validate_shorebird_requirements() {
             echo "Error: shorebirdToken is required when useShorebird is true"
             exit 1
         fi
+
+        # Check if shorebird.yaml exists
+        if [ ! -f "shorebird.yaml" ]; then
+            echo "Error: shorebird.yaml file is required when useShorebird is true"
+            echo "Please run 'shorebird init' to create a shorebird.yaml file"
+            exit 1
+        fi
+
+        # Check if shorebird.yaml contains app_id
+        if ! grep -q "app_id:" "shorebird.yaml"; then
+            echo "Error: app_id is missing in shorebird.yaml"
+            echo "Please ensure your shorebird.yaml contains an app_id key"
+            exit 1
+        fi
     fi
 }
 

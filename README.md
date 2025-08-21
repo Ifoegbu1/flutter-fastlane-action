@@ -171,11 +171,44 @@ For Android builds, you need to provide:
 
 ## Shorebird Integration
 
+### Setting up Shorebird
+
+Before using Shorebird with this action, you need to set up your project with Shorebird:
+
+1. **Install the Shorebird CLI**:
+
+   ```bash
+   curl --proto '=https' --tlsv1.2 -sSf https://raw.githubusercontent.com/shorebirdtech/install/main/install.sh | bash
+   ```
+
+2. **Login to Shorebird**:
+
+   ```bash
+   shorebird login
+   ```
+
+3. **Create a Shorebird app** (if you haven't already):
+
+   ```bash
+   shorebird init
+   ```
+
+   This will create a `shorebird.yaml` file in your project with your app's configuration.
+
+4. **Get your Shorebird token**:
+   ```bash
+   shorebird login:ci
+   ```
+   Save this token as a GitHub Secret to use with this action.
+
+### Using Shorebird with this Action
+
 To use Shorebird for code push:
 
 1. Set `useShorebird` to `true`
-2. Provide `shorebirdToken`
+2. Provide `shorebirdToken` (stored as a GitHub Secret)
 3. Set `isPatch` to `true` if you want to create a patch build
+4. Ensure your project has a properly configured `shorebird.yaml` file with an `app_id`
 
 ## Examples
 
