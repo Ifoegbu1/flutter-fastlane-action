@@ -1,24 +1,102 @@
 #!/bin/bash
 set -e
 
-# Expected parameters
-IS_PATCH="$1"
-FLUTTER_VERSION="$2"
-BUILD_NAME="$3"
-BUILD_NUMBER="$4"
-IOS_SECRETS="$5"
-PLATFORM="$6"
-WORKING_DIRECTORY="$7"
-SHOREBIRD_TOKEN="$8"
-USE_SHOREBIRD="$9"
-ANDROID_KEY_STORE_PATH="${10}"
-ANDROID_KEY_STORE_PASSWORD="${11}"
-ANDROID_KEY_STORE_ALIAS="${12}"
-ANDROID_KEY_PASSWORD="${13}"
-SERVICE_ACCOUNT_JSON_PLAIN_TEXT="${14}"
-PACKAGE_NAME="${15}"
-BUILD_ARGS_ANDROID="${16}"
-BUILD_ARGS_IOS="${17}"
+# Default values
+IS_PATCH=""
+FLUTTER_VERSION=""
+BUILD_NAME=""
+BUILD_NUMBER=""
+IOS_SECRETS=""
+PLATFORM=""
+WORKING_DIRECTORY=""
+SHOREBIRD_TOKEN=""
+USE_SHOREBIRD=""
+ANDROID_KEY_STORE_PATH=""
+ANDROID_KEY_STORE_PASSWORD=""
+ANDROID_KEY_STORE_ALIAS=""
+ANDROID_KEY_PASSWORD=""
+SERVICE_ACCOUNT_JSON_PLAIN_TEXT=""
+PACKAGE_NAME=""
+BUILD_ARGS_ANDROID=""
+BUILD_ARGS_IOS=""
+
+# Parse named parameters
+while [[ $# -gt 0 ]]; do
+    case $1 in
+    --is-patch)
+        IS_PATCH="$2"
+        shift 2
+        ;;
+    --flutter-version)
+        FLUTTER_VERSION="$2"
+        shift 2
+        ;;
+    --build-name)
+        BUILD_NAME="$2"
+        shift 2
+        ;;
+    --build-number)
+        BUILD_NUMBER="$2"
+        shift 2
+        ;;
+    --ios-secrets)
+        IOS_SECRETS="$2"
+        shift 2
+        ;;
+    --platform)
+        PLATFORM="$2"
+        shift 2
+        ;;
+    --working-directory)
+        WORKING_DIRECTORY="$2"
+        shift 2
+        ;;
+    --shorebird-token)
+        SHOREBIRD_TOKEN="$2"
+        shift 2
+        ;;
+    --use-shorebird)
+        USE_SHOREBIRD="$2"
+        shift 2
+        ;;
+    --android-key-store-path)
+        ANDROID_KEY_STORE_PATH="$2"
+        shift 2
+        ;;
+    --android-key-store-password)
+        ANDROID_KEY_STORE_PASSWORD="$2"
+        shift 2
+        ;;
+    --android-key-store-alias)
+        ANDROID_KEY_STORE_ALIAS="$2"
+        shift 2
+        ;;
+    --android-key-password)
+        ANDROID_KEY_PASSWORD="$2"
+        shift 2
+        ;;
+    --service-account-json)
+        SERVICE_ACCOUNT_JSON_PLAIN_TEXT="$2"
+        shift 2
+        ;;
+    --package-name)
+        PACKAGE_NAME="$2"
+        shift 2
+        ;;
+    --build-args-android)
+        BUILD_ARGS_ANDROID="$2"
+        shift 2
+        ;;
+    --build-args-ios)
+        BUILD_ARGS_IOS="$2"
+        shift 2
+        ;;
+    *)
+        echo "Unknown parameter: $1"
+        exit 1
+        ;;
+    esac
+done
 
 yaml_file="pubspec.yaml"
 
