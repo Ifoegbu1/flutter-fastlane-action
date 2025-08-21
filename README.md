@@ -77,7 +77,7 @@ steps:
     uses: actions/checkout@v3
 
   - name: Build and Deploy Flutter App
-    uses: ifoegbu1/flutter-fastlane-action@v1
+    uses: Ifoegbu1/flutter-fastlane-action@v1
     with:
       platform: "ios" # or 'android'
       iosDistributionJson: ${{ secrets.IOS_DISTRIBUTION_JSON }}
@@ -229,7 +229,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build and deploy iOS app
-        uses: ifoegbu1/flutter-fastlane-action@v1
+        uses: Ifoegbu1/flutter-fastlane-action@v1
         with:
           platform: "ios"
           buildNumber: ${{ github.run_number }}
@@ -255,7 +255,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build and deploy Android app
-        uses: ifoegbu1/flutter-fastlane-action@v1
+        uses: Ifoegbu1/flutter-fastlane-action@v1
         with:
           platform: "android"
           buildNumber: ${{ github.run_number }}
@@ -286,7 +286,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build Shorebird patch
-        uses: ifoegbu1/flutter-fastlane-action@v1
+        uses: Ifoegbu1/flutter-fastlane-action@v1
         with:
           platform: "android" # or 'ios'
           useShorebird: true

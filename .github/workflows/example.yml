@@ -5,12 +5,12 @@ on:
       - main
   workflow_dispatch:
 env:
-      IOS_DISTRIBUTION_JSON: ${{ secrets.IOS_DISTRIBUTION_JSON }}
-      SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-      PACKAGE_NAME: ${{ vars.PACKAGE_NAME }}
-      KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
-      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+  IOS_DISTRIBUTION_JSON: ${{ secrets.IOS_DISTRIBUTION_JSON }}
+  SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+  PACKAGE_NAME: ${{ vars.PACKAGE_NAME }}
+  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
 jobs:
   # Android deployment example
@@ -22,7 +22,7 @@ jobs:
 
       # Use the action to build and deploy
       - name: Build and deploy to Play Store
-        uses: ifoegbu1/flutter-fastlane-action@v1
+        uses: Ifoegbu1/flutter-fastlane-action@v1
         with:
           platform: android
           buildNumber: ${{ github.run_number }}
@@ -44,7 +44,7 @@ jobs:
 
       # Use the action to build and deploy
       - name: Build and deploy to TestFlight
-        uses: ifoegbu1/flutter-fastlane-action@v1
+        uses: Ifoegbu1/flutter-fastlane-action@v1
         with:
           platform: ios
           buildNumber: ${{ github.run_number }}
