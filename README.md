@@ -22,7 +22,7 @@ A GitHub Action to build and deploy Flutter apps using Fastlane (for iOS) and Sh
 ### iOS Requirements
 
 - Apple Developer account
-- App Store Connect API key
+- App Store Connect API key and related configs as in IOS_DISTRIBUTION_JSON
 - Match repository for certificate management
 
 #### Fastlane and Match Setup
@@ -77,7 +77,7 @@ steps:
     uses: actions/checkout@v3
 
   - name: Build and Deploy Flutter App
-    uses: Ifoegbu1/flutter-fastlane-action@v1
+    uses: Ifoegbu1/flutter-fastlane-action@main
     with:
       platform: "ios" # or 'android'
       iosDistributionJson: ${{ secrets.IOS_DISTRIBUTION_JSON }}
@@ -169,6 +169,108 @@ For Android builds, you need to provide:
    - `serviceAccountJsonPlainText`
    - `track` (optional, defaults to `internal`)
 
+### Setting up Google Play Service Account
+
+To deploy to Google Play Store, you need a service account JSON key:
+
+1. **Enable the Google Play Android Developer API**
+
+   - Go to https://console.cloud.google.com/apis/library/androidpublisher.googleapis.com
+   - Click on **Enable**
+
+2. **Create a service account in Google Cloud Platform**
+
+   - Navigate to https://cloud.google.com/gcp
+   - Open **IAM & Admin > Service accounts > Create service account**
+   - Pick a name for the new account (no need to grant permissions)
+
+3. **Get the service account JSON key**
+
+   - Open the newly created service account
+   - Click on **Keys** tab and add a new key (JSON type)
+   - A JSON file will be automatically downloaded to your machine
+
+4. **Store in GitHub Secrets**
+
+   - Copy the entire contents of the downloaded JSON file
+   - Create a new repository secret (e.g., `SERVICE_ACCOUNT_JSON`)
+   - Paste the JSON content into the secret value
+   - In your workflow, set: `serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}`
+
+5. **Add the service account to Google Play Console**
+   - Open https://play.google.com/console and select your developer account
+   - Go to **Users and permissions**
+   - Click **Invite new user** and add the email of the service account
+   - Grant appropriate app permissions for deployment
+
+### IMPORTANT: First-time Google Play Upload
+
+⚠️ **Note:** Google Play deployment through this action **ONLY WORKS** if:
+
+1. Your app has already been manually uploaded to Google Play Console at least once
+2. The app has been set up in at least one track (internal, alpha, beta, or production)
+3. The initial store listing, content rating, and pricing & availability have been configured
+
+This is a limitation of the Google Play API. For first-time app submissions, you must:
+
+1. Create the app in the Google Play Console
+2. Set up all required store listing information
+3. Manually upload the first APK/AAB version
+4. After the first manual upload is complete, subsequent updates can be automated using this action
+
+### IMPORTANT: Android build.gradle Configuration
+
+To ensure proper app signing, you **MUST** modify your `android/app/build.gradle` file to include the following configurations:
+
+```gradle
+// At the top of the build.gradle file, before android { ... }
+def keystoreProperties = new Properties()
+def keystorePropertiesFile = rootProject.file('key.properties')
+if (keystorePropertiesFile.exists()) {
+    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+}
+
+android {
+    // ... existing configurations
+
+    signingConfigs {
+        release {
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
+            storePassword keystoreProperties['storePassword']
+        }
+    }
+
+    buildTypes {
+        release {
+            // ... existing release configurations
+            signingConfig signingConfigs.release
+        }
+
+        debug {
+            signingConfig signingConfigs.debug
+            // Other debug build type configurations
+        }
+    }
+
+    // ... other configurations
+}
+```
+
+The above configuration enables:
+
+1. Reading signing properties from a `key.properties` file
+2. Using these properties for release builds
+
+### Android key.properties File
+
+When using this GitHub Action:
+
+- The action will automatically create this file during the build process
+- Values are populated from the action inputs (`androidKeyStorePath`, `androidKeyStorePassword`, etc.)
+- Ensure your keystore file is accessible to the action (can be stored in the repository or downloaded during the workflow)
+
 ## Shorebird Integration
 
 ### Setting up Shorebird
@@ -229,7 +331,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build and deploy iOS app
-        uses: Ifoegbu1/flutter-fastlane-action@v1
+        uses: Ifoegbu1/flutter-fastlane-action@main
         with:
           platform: "ios"
           buildNumber: ${{ github.run_number }}
@@ -255,7 +357,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Build and deploy Android app
-        uses: Ifoegbu1/flutter-fastlane-action@v1
+        uses: Ifoegbu1/flutter-fastlane-action@main
         with:
           platform: "android"
           buildNumber: ${{ github.run_number }}
@@ -292,9 +394,7 @@ jobs:
           useShorebird: true
           isPatch: true
           shorebirdToken: ${{ secrets.SHOREBIRD_TOKEN }}
-          # Platform specific build args can be provided
-          androidBuildArgs: "--allow-asset-diffs" # If platform is android
-          # iosBuildArgs: "--allow-asset-diffs"    # If platform is ios
+        
           # Other required parameters based on platform
 ```
 
@@ -306,6 +406,54 @@ jobs:
 - The example iOS Distribution JSON contains placeholder values - replace with your actual values
 - For iOS builds, the entire distribution JSON must be stored as a GitHub Secret
 - For Android builds, all keystore information and service account credentials must be stored as GitHub Secrets
+
+
+## Troubleshooting
+
+### Common Issues
+
+#### Android Build Issues
+
+1. **App signing problems:**
+
+   - Ensure your `build.gradle` is properly configured as shown in the Android setup section
+   - Verify that your keystore file is valid and accessible to the action
+   - Check that the key alias and passwords are correct in your GitHub secrets
+
+2. **Google Play deployment fails:**
+
+   - Ensure your service account has proper permissions in the Google Play Console
+   - Verify that your package name matches exactly with what's in the Play Store
+   - Check that your app is properly registered in the desired track
+
+3. **Build command errors:**
+   - Try removing complex build arguments and adding them back one by one
+   - Ensure your `androidBuildArgs` don't conflict with the signing configuration
+
+#### iOS Build Issues
+
+1. **Match certificate errors:**
+
+   - Ensure your Match Git repository is accessible via the provided SSH key
+   - Verify that the Match password is correct
+   - Try running Match locally to validate certificates before using in the action
+
+2. **TestFlight upload fails:**
+
+   - Verify your App Store Connect API key has sufficient permissions
+   - Ensure your bundle identifier matches what's registered in App Store Connect
+   - Check that your app version and build number are not already in use
+
+3. **Fastlane errors:**
+   - Ensure your fastlane installation is properly set up in your iOS folder
+   - Try running the fastlane commands locally to identify issues
+
+### Getting Support
+
+For issues with this action:
+
+- Check the [open issues](https://github.com/Ifoegbu1/flutter-fastlane-action/issues) for similar problems
+- File a new issue with detailed logs and reproduction steps
 
 ## License
 

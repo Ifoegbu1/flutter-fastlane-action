@@ -22,7 +22,7 @@ jobs:
 
       # Use the action to build and deploy
       - name: Build and deploy to Play Store
-        uses: Ifoegbu1/flutter-fastlane-action@v1
+        uses: Ifoegbu1/flutter-fastlane-action@main
         with:
           platform: android
           buildNumber: ${{ github.run_number }}
@@ -44,7 +44,7 @@ jobs:
 
       # Use the action to build and deploy
       - name: Build and deploy to TestFlight
-        uses: Ifoegbu1/flutter-fastlane-action@v1
+        uses: Ifoegbu1/flutter-fastlane-action@main
         with:
           platform: ios
           buildNumber: ${{ github.run_number }}

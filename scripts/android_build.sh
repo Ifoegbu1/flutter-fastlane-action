@@ -39,7 +39,6 @@ shorebird_update() {
         echo "✅ Shorebird release completed successfully."
 
         # Sign the AAB file if keystore is provided
-        sign_aab
 
         echo "❌ Shorebird release failed with exit code $BUILD_EXIT_CODE. Skipping signing."
         exit $BUILD_EXIT_CODE
@@ -71,44 +70,23 @@ flutter_build() {
 
         # Sign the AAB file if keystore is provided
 
-        sign_aab
-
     else
         echo "❌ Flutter build failed with exit code $BUILD_EXIT_CODE. Skipping signing."
         exit $BUILD_EXIT_CODE
     fi
 }
 
-sign_aab() {
-    aab_path="build/app/outputs/bundle/release/app-release.aab"
+configure_keystore() {
+    cp "$androidKeyStorePath" android/app/keystore.jks
+    echo "storePassword= $androidKeyStorePassword" >>android/key.properties
+    echo "keyPassword= $androidKeyPassword" >>android/key.properties
+    echo "keyAlias=$androidKeyStoreAlias" >>android/key.properties
+    echo "storeFile=keystore.jks" >>android/key.properties
 
-    echo "🔐 SIGNING AAB FILE"
-    jarsigner -sigalg SHA256withRSA -digestalg SHA-256 \
-        -keystore "$androidKeyStorePath" \
-        -storepass "$androidKeyStorePassword" \
-        -keypass "$androidKeyPassword" \
-        "$aab_path" "$androidKeyStoreAlias"
-
-    SIGN_EXIT_CODE=$?
-    if [ $SIGN_EXIT_CODE -ne 0 ]; then
-        echo "❌ Signing failed with exit code $SIGN_EXIT_CODE"
-        exit $SIGN_EXIT_CODE
-    fi
-
-    # Verify the signature
-    echo "✅ VERIFYING SIGNATURE"
-    jarsigner -verify -verbose "$aab_path"
-
-    VERIFY_EXIT_CODE=$?
-    if [ $VERIFY_EXIT_CODE -ne 0 ]; then
-        echo "❌ Signature verification failed with exit code $VERIFY_EXIT_CODE"
-        exit $VERIFY_EXIT_CODE
-    else
-        echo "✅ AAB signed and verified successfully"
-    fi
 }
 
 build() {
+    configure_keystore
 
     if [ "$isShorebird" == "true" ]; then
         shorebird_build
