@@ -77,7 +77,7 @@ validate_android_keystore() {
 
 # Function to validate Google Play deployment requirements
 validate_google_play_requirements() {
-    if [ -z "$serviceAccountJsonPlainText" ]; then
+    if [ "$hasServiceAccount" != "true" ]; then
         echo "Error: serviceAccountJsonPlainText is required for Google Play deployment"
         exit 1
     fi
