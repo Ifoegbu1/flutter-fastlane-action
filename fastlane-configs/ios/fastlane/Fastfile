@@ -1,0 +1,89 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :ios_testflight do
+    setup_ci
+    
+    # Configure App Store Connect API Key
+    app_store_connect_api_key(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_API_ISSUER_ID"],
+      key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
+      is_key_content_base64: ENV["isKeyBase64"]
+    )
+    
+    # Fetch certs & profiles for App Store distribution
+    match(
+      type: "appstore",  
+      readonly: false,
+    )
+    
+    # Update Xcode project with Match profiles
+      update_project_provisioning(
+      xcodeproj: "Runner.xcodeproj",
+      profile: ENV["sigh_#{ENV['BUNDLE_IDENTIFIER']}_appstore_profile-path"],
+      target_filter: "Runner",
+      build_configuration: "Release"
+      )
+
+      # Update code signing settings
+      update_code_signing_settings(
+        use_automatic_signing: false,
+        team_id: ENV["TEAM_ID"],
+        bundle_identifier: ENV["BUNDLE_IDENTIFIER"],
+        profile_name: "match AppStore #{ENV['BUNDLE_IDENTIFIER']}",
+        code_sign_identity: "Apple Distribution"
+      )
+
+      flutterV = ENV["flutterV"] 
+      isPatch = ENV["isPatch"] || "false"
+      isShorebird = ENV["isShorebird"] || "false"
+
+      releaseV = ENV["releaseV"]
+
+      if isShorebird == "true"
+        sh "echo \"🐦 Shorebird action initiated\""
+        if isPatch == "true"
+          sh "echo \"🎯 Shorebird Patch action initiated\""
+          shorebird_patch(platform: "ios", args: "--release-version #{releaseV} --allow-asset-diffs")
+        else
+          sh "echo \"🚀 Shorebird Release action initiated\""
+          shorebird_release(
+            platform: "ios", 
+            args: "--flutter-version #{flutterV} -- --no-tree-shake-icons",
+            # verbose: true
+          )
+        end
+      else
+        sh "echo \"🚀 Building with Flutter version: #{flutterV}\""
+        sh "cd ../.. && flutter build ipa --release"
+      end
+
+
+    # Upload to TestFlight
+    if isPatch == "false"
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      changelog: "Beta release - latest features and bug fixes"
+    )
+    end
+  end
+
+  
+end

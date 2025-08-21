@@ -1,0 +1,58 @@
+name: Flutter App Deployment Example
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  deploy-android:
+    runs-on: ubuntu-latest
+    env:
+      # Example of environment variables accessible to the action
+      SUPPLY_JSON_KEY_DATA: ${{ secrets.PLAY_STORE_JSON_KEY }}
+      FASTLANE_SKIP_UPDATE_CHECK: true
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=keystore.jks" >> android/key.properties
+
+      - name: Deploy to Play Store
+        uses: ./
+        with:
+          platform: android
+          lane: deploy
+          fastlane-env: production
+          build-number: ${{ github.run_number }}
+        # Env variables can also be specified at the step level
+        env:
+          MY_CUSTOM_VAR: "Available in Fastlane"
+
+  deploy-ios:
+    runs-on: macos-latest
+    env:
+      # iOS-specific environment variables
+      FASTLANE_APPLE_ID: ${{ secrets.APPLE_ID }}
+      FASTLANE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
+      FASTLANE_APPLE_APPLICATION_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install Apple certificates
+        uses: apple-actions/import-codesign-certs@v1
+        with:
+          p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+          p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+
+      - name: Deploy to App Store
+        uses: ./
+        with:
+          platform: ios
+          lane: release
+          build-number: ${{ github.run_number }}
+          build-name: ${{ github.ref_name }}

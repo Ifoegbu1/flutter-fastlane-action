@@ -1,0 +1,172 @@
+name: "Flutter Fastlane Action"
+description: "GitHub Action to build and deploy Flutter apps using Fastlane(ios) and Shorebird(optional)"
+author: "Charles Ifoegbu"
+branding:
+  icon: "smartphone"
+  color: "blue"
+
+inputs:
+  workingDirectory:
+    description: "Directory where your Flutter project is located"
+    required: false
+    default: "."
+  platform:
+    description: "Target platform (ios/android)"
+    required: true
+  buildNumber:
+    description: "Build number to use"
+    required: false
+  buildName:
+    description: "Build name/version to use"
+    required: false
+  iosDistributionJson:
+    description: "IOS secrets json to use. See README.md for more details"
+    required: true
+  isPatch:
+    description: "Whether to use shorebird patch build(Note: This is only applicable to shorebird projects)"
+    required: false
+    default: "false"
+  flutterVersion:
+    description: "Flutter version to use"
+    required: false
+    default: "3.27.4"
+  shorebirdToken:
+    description: "Shorebird token to use"
+    required: false
+    default: ""
+  useShorebird:
+    description: "Whether to use shorebird"
+    required: false
+    default: "false"
+  javaVersion:
+    description: "Java version to use"
+    required: false
+    default: "17"    
+  packageName:
+    description: "Package name for android"
+    required: false
+    default: ""
+  track:
+    description: "Track to use for play store deployment"
+    required: false
+    default: "internal"
+  serviceAccountJsonPlainText:
+    description: "Service account json plain text to use for play store deployment"
+    required: false
+    default: ""
+  androidKeyStorePath:
+    description: "Path to the android key store"
+    required: false
+    default: ""
+  androidKeyStorePassword:
+    description: "Password to the android key store"
+    required: false
+    default: ""
+  androidKeyStoreAlias:
+    description: "Alias to the android key store"
+    required: false
+    default: ""
+  androidKeyPassword:
+    description: "Password to the android key"
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - name: 🔧 Setup Environment Variables
+      working-directory: ${{ inputs.workingDirectory }}
+      shell: bash
+      run: |
+        ${{ github.action_path }}/scripts/setup_env_vars.sh \
+          "${{ inputs.isPatch }}" \
+          "${{ inputs.flutterVersion }}" \
+          "${{ inputs.buildName }}" \
+          "${{ inputs.buildNumber }}" \
+          "${{ inputs.iosDistributionJson }}" \
+          "${{ inputs.platform }}" \
+          "${{ inputs.workingDirectory }}" \
+          "${{ inputs.shorebirdToken }}" \
+          "${{ inputs.useShorebird }}" \
+          "${{ inputs.androidKeyStorePath }}" \
+          "${{ inputs.androidKeyStorePassword }}" \
+          "${{ inputs.androidKeyStoreAlias }}" \
+          "${{ inputs.androidKeyPassword }}" \
+          "${{ inputs.serviceAccountJsonPlainText }}" \
+          "${{ inputs.packageName }}"
+
+    - name: Validate Required Inputs
+      shell: bash
+      run: |
+        ${{ github.action_path }}/scripts/validate_inputs.sh
+    - name: ☕ Change Java Version
+      if: ${{ env.platform == 'android' }}
+      uses: actions/setup-java@v4
+      with:
+        distribution: "temurin"
+        java-version: "${{ inputs.javaVersion }}"
+
+    - name: 📦 Get Fastlane Configs and update ios folder
+      working-directory: ${{ env.workingDir }}
+      if: ${{ env.platform == 'ios' }}
+      shell: bash
+      run: |
+        ${{ github.action_path }}/scripts/get_fastlane_configs.sh
+
+    - name: 💎 Setup Ruby with ruby-build
+      if: ${{ env.platform == 'ios' }}
+      shell: bash
+      run: |
+        ${{ github.action_path }}/scripts/install_ruby.sh
+
+    - name: 📦 Install Fastlane Dependencies
+      if: ${{ env.platform == 'ios' }}
+      shell: bash
+      working-directory: ${{ env.workingDir }}/ios
+      run: |
+        bundle install
+
+    - name: 🐦 Setup Flutter
+      shell: bash
+      if: ${{ env.isShorebird == 'false' }}
+      run: |
+        ${{ github.action_path }}/scripts/install_flutter.sh
+
+    - name: 🐦 Setup Shorebird
+      shell: bash
+      if: ${{ env.isShorebird == 'true' }}
+      run: |
+        ${{ github.action_path }}/scripts/install_shorebird.sh
+
+    - name: 🏗️ Build and Deploy iOS App (Testflight)
+      shell: bash
+      if: ${{ env.platform == 'ios' }}
+      working-directory: ${{ env.workingDir }}/ios
+      run: |
+        bundle exec fastlane ios_testflight
+
+    - name: 🏗️ Build Android App
+      if: ${{ env.platform == 'android' }}
+      working-directory: ${{ env.workingDir }}
+      shell: bash
+      run: |
+        ${{ github.action_path }}/scripts/android_build.sh
+
+    - name: 🚀 Deploy to Google Play
+      if: ${{ env.platform == 'android' && env.isPatch == 'false' }}
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ inputs.serviceAccountJsonPlainText }}
+        packageName: ${{ inputs.packageName }}
+        releaseFiles: ${{ env.workingDir }}/build/app/outputs/bundle/release/app-release.aab
+        track: ${{ inputs.track }}
+        status: completed
+        inAppUpdatePriority: 5
+        whatsNewDirectory: ${{ env.workingDir }}/distribution/whatsnew
+        mappingFile: ${{ env.workingDir }}/build/app/outputs/mapping/release/mapping.txt
+        debugSymbols: ${{ env.workingDir }}/build/app/intermediates/merged_native_libs/release/out/lib
+
+    - name: Restore SSH
+      shell: bash
+      if: ${{ env.platform == 'ios' && always()}}
+      run: |
+        ${{ github.action_path }}/scripts/restore_ssh.sh

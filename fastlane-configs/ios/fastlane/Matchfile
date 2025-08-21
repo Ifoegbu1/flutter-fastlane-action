@@ -1,0 +1,19 @@
+git_url(ENV["SIGNING_GIT_URL"])
+
+storage_mode("git")
+
+type("appstore") # The default type, can be: appstore, adhoc, enterprise or development
+
+app_identifier([ENV["BUNDLE_IDENTIFIER"]])
+
+username(ENV["APPLE_ID"]) # Your Apple Developer Portal username
+
+team_id(ENV["TEAM_ID"])
+
+clone_branch_directly(true)
+
+readonly(false)
+
+shallow_clone(true)
+
+git_branch("master")
