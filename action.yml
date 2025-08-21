@@ -108,6 +108,8 @@ runs:
       shell: bash
       run: |
         ${{ github.action_path }}/scripts/validate_inputs.sh
+
+        
     - name: ☕ Change Java Version
       if: ${{ env.platform == 'android' }}
       uses: actions/setup-java@v4
