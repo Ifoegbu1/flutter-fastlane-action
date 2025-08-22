@@ -17,6 +17,7 @@ ANDROID_KEY_STORE_ALIAS=""
 ANDROID_KEY_PASSWORD=""
 SERVICE_ACCOUNT_JSON_PLAIN_TEXT=""
 PACKAGE_NAME=""
+BUNDLE_IDENTIFIER=""
 BUILD_ARGS_ANDROID=""
 BUILD_ARGS_IOS=""
 
@@ -83,6 +84,10 @@ while [[ $# -gt 0 ]]; do
         PACKAGE_NAME="$2"
         shift 2
         ;;
+    --bundle-identifier)
+        BUNDLE_IDENTIFIER="$2"
+        shift 2
+        ;;
     --build-args-android)
         BUILD_ARGS_ANDROID="$2"
         shift 2
@@ -92,7 +97,7 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
     *)
-        echo "Unknown parameter: $1"
+        echo "Unknown parameter: $1, please confirm your inputs"
         exit 1
         ;;
     esac
@@ -117,7 +122,8 @@ echo "androidKeyStoreAlias=$ANDROID_KEY_STORE_ALIAS" >>"$GITHUB_ENV"
 echo "androidKeyPassword=$ANDROID_KEY_PASSWORD" >>"$GITHUB_ENV"
 echo "buildArgsAndroid=$BUILD_ARGS_ANDROID" >>"$GITHUB_ENV"
 echo "buildArgsIos=$BUILD_ARGS_IOS" >>"$GITHUB_ENV"
-
+echo "BUNDLE_IDENTIFIER=$BUNDLE_IDENTIFIER" >>"$GITHUB_ENV"
+echo "packageName=$PACKAGE_NAME" >>"$GITHUB_ENV"
 # Check if API key content is base64 encoded (for iOS)
 if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_SECRETS" ]; then
     # Extract API key content
@@ -140,15 +146,14 @@ if [ -n "$SERVICE_ACCOUNT_JSON_PLAIN_TEXT" ]; then
     # Don't add service account JSON directly to environment - will be used directly in the action
     echo "hasServiceAccount=true" >>"$GITHUB_ENV"
 fi
-if [ -n "$PACKAGE_NAME" ]; then
-    echo "packageName=$PACKAGE_NAME" >>"$GITHUB_ENV"
-fi
+
 releaseV=$(grep 'version:' "$yaml_file" | awk '{print $2}')
 echo "releaseV=$releaseV" >>"$GITHUB_ENV"
 # Execute platform-specific setup scripts
 if [ "$PLATFORM" == "ios" ]; then
     echo "Setting up iOS environment variables..."
     "$(dirname "$0")/ios_setup_env_vars_secure.sh"
+    
 fi
 
 echo "✅ Environment variables set successfully."
@@ -156,5 +161,5 @@ echo ""
 echo "📋 Summary:"
 echo "  - isPatch: $IS_PATCH"
 echo "  - flutterV: $FLUTTER_VERSION"
-echo "  - isShorebird: $USE_SHOREBIRD"
+echo "  - useShorebird: $USE_SHOREBIRD"
 echo "  - releaseV: $releaseV"

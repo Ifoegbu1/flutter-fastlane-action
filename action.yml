@@ -54,6 +54,10 @@ inputs:
     description: "Package name for android"
     required: false
     default: ""
+  bundleIdentifier:
+    description: "Bundle identifier for ios"
+    required: false
+    default: ""
   track:
     description: "Track to use for play store deployment"
     required: false
@@ -102,6 +106,7 @@ runs:
           --package-name "${{ inputs.packageName }}" \
           --build-args-android "${{ inputs.androidBuildArgs }}" \
           --build-args-ios "${{ inputs.iosBuildArgs }}" \
+          --bundle-identifier "${{ inputs.bundleIdentifier }}" \
           --service-account-json '${{ inputs.serviceAccountJsonPlainText }}' 
 
     - name: Validate Required Inputs

@@ -54,15 +54,21 @@ A GitHub Action to build and deploy Flutter apps using Fastlane (for iOS) and Sh
 
    Remember this password as you'll need to add it to your `IOS_DISTRIBUTION_JSON` as the `MATCH_PASSWORD`.
 
-<a name="ssh-deploy-keys"></a> 4. **Set up SSH deploy keys for your Match repository(MATCH_SIGNING_GIT_URL)**:
+### SSH Deploy Keys for Match Repository
 
-- Generate an SSH key pair:
-  ```bash
-  ssh-keygen -t ed25519 -C "your_email@example.com" -f ./match_deploy_key
-  ```
-- Add the public key (`match_deploy_key.pub`) to your Match repository's deploy keys in GitHub
-- Add the private key content to your `IOS_DISTRIBUTION_JSON` as the `MATCH_GIT_SSH_KEY`
-- For more details, see [How to Use GitHub Deploy Keys](https://dylancastillo.co/posts/how-to-use-github-deploy-keys.html)
+To set up SSH deploy keys for your Match repository:
+
+1. Generate an SSH key pair:
+
+   ```bash
+   ssh-keygen -t ed25519 -C "your_email@example.com" -f ./match_deploy_key
+   ```
+
+2. Add the public key (`match_deploy_key.pub`) to your Match repository's deploy keys in GitHub
+
+3. Add the private key content to your `IOS_DISTRIBUTION_JSON` as the `MATCH_GIT_SSH_KEY`
+
+4. For more details, see [How to Use GitHub Deploy Keys](https://dylancastillo.co/posts/how-to-use-github-deploy-keys.html)
 
 ### Android Requirements
 
@@ -72,17 +78,36 @@ A GitHub Action to build and deploy Flutter apps using Fastlane (for iOS) and Sh
 
 ## Usage
 
+### iOS Usage
+
 ```yaml
 steps:
   - name: Checkout code
     uses: actions/checkout@v3
 
-  - name: Build and Deploy Flutter App
+  - name: Build and Deploy iOS App
     uses: Ifoegbu1/flutter-fastlane-action@main
     with:
-      platform: "ios" # or 'android'
+      platform: "ios"
+      bundleIdentifier: "com.example.myapp"
       iosDistributionJson: ${{ secrets.IOS_DISTRIBUTION_JSON }}
       # Other parameters as needed
+```
+
+### Android Usage
+
+```yaml
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v3
+
+  - name: Build and Deploy Android App
+    uses: Ifoegbu1/flutter-fastlane-action@main
+    with:
+      platform: "android"
+      packageName: "com.example.myapp"
+      serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+      # Other required Android parameters
 ```
 
 ## Input Parameters
@@ -101,6 +126,7 @@ steps:
 | `shorebirdToken`              | No                | -          | Shorebird token (required if useShorebird is true) |
 | `useShorebird`                | No                | `false`    | Whether to use shorebird                           |
 | `javaVersion`                 | No                | `17`       | Java version to use                                |
+| `bundleIdentifier`            | Yes (for ios)     | -          | Bundle identifier for iOS                          |
 | `packageName`                 | Yes (for Android) | -          | Package name for Android                           |
 | `track`                       | No                | `internal` | Track to use for Google Play deployment            |
 | `serviceAccountJsonPlainText` | Yes (for Android) | -          | Service account JSON for Play Store deployment     |
@@ -128,7 +154,6 @@ The `iosDistributionJson` parameter should contain a JSON object with the follow
 
 ```json
 {
-  "BUNDLE_IDENTIFIER": "com.example.app",
   "TEAM_ID": "ABCD1234",
   "APPLE_ID": "example@example.com",
   "APP_STORE_CONNECT_API_ISSUER_ID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
@@ -142,17 +167,16 @@ The `iosDistributionJson` parameter should contain a JSON object with the follow
 
 ### Required iOS Distribution JSON Fields
 
-| Field                               | Description                                                                                                                                                               |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `BUNDLE_IDENTIFIER`                 | iOS app bundle identifier                                                                                                                                                 |
-| `TEAM_ID`                           | Apple Developer Team ID                                                                                                                                                   |
-| `APPLE_ID`                          | Apple ID email                                                                                                                                                            |
-| `APP_STORE_CONNECT_API_ISSUER_ID`   | App Store Connect API issuer ID                                                                                                                                           |
-| `APP_STORE_CONNECT_API_KEY_ID`      | App Store Connect API key ID                                                                                                                                              |
-| `APP_STORE_CONNECT_API_KEY_CONTENT` | App Store Connect API key content (can be Base64-encoded or not)                                                                                                          |
-| `MATCH_SIGNING_GIT_URL`             | SSH git URL for iOS signing repository (must start with `git@` and be accessible via SSH). See [Set up SSH deploy keys](#ssh-deploy-keys) section for setup instructions. |
-| `MATCH_PASSWORD`                    | Password for Match                                                                                                                                                        |
-| `MATCH_GIT_SSH_KEY`                 | SSH key for accessing Match repository                                                                                                                                    |
+| Field                               | Description                                                                                                                                                                                                  |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `TEAM_ID`                           | Apple Developer Team ID                                                                                                                                                                                      |
+| `APPLE_ID`                          | Apple ID email                                                                                                                                                                                               |
+| `APP_STORE_CONNECT_API_ISSUER_ID`   | App Store Connect API issuer ID                                                                                                                                                                              |
+| `APP_STORE_CONNECT_API_KEY_ID`      | App Store Connect API key ID                                                                                                                                                                                 |
+| `APP_STORE_CONNECT_API_KEY_CONTENT` | App Store Connect API key content (can be Base64-encoded or not)                                                                                                                                             |
+| `MATCH_SIGNING_GIT_URL`             | SSH git URL for iOS signing repository (must start with `git@` and be accessible via SSH). See [SSH Deploy Keys for Match Repository](#ssh-deploy-keys-for-match-repository) section for setup instructions. |
+| `MATCH_PASSWORD`                    | Password for Match                                                                                                                                                                                           |
+| `MATCH_GIT_SSH_KEY`                 | SSH key for accessing Match repository                                                                                                                                                                       |
 
 ## Android Setup
 
@@ -335,8 +359,7 @@ jobs:
         uses: Ifoegbu1/flutter-fastlane-action@main
         with:
           platform: "ios"
-          buildNumber: ${{ github.run_number }}
-          buildName: "1.0.0"
+          bundleIdentifier: "com.example.myapp"
           iosBuildArgs: "--no-sound-null-safety --dart-define=ENVIRONMENT=production"
           iosDistributionJson: ${{ secrets.IOS_DISTRIBUTION_JSON }}
 ```
@@ -361,8 +384,6 @@ jobs:
         uses: Ifoegbu1/flutter-fastlane-action@main
         with:
           platform: "android"
-          buildNumber: ${{ github.run_number }}
-          buildName: "1.0.0"
           androidBuildArgs: "--no-sound-null-safety --dart-define=ENVIRONMENT=production"
           packageName: "com.example.app"
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}

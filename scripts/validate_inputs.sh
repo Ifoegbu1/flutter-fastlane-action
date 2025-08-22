@@ -32,7 +32,6 @@ validate_ios_inputs() {
 
     # Check for required keys in iOS secrets JSON
     required_keys=(
-        "BUNDLE_IDENTIFIER"
         "TEAM_ID"
         "APPLE_ID"
         "APP_STORE_CONNECT_API_ISSUER_ID"
@@ -95,7 +94,6 @@ validate_shorebird_requirements() {
             exit 1
         fi
 
-
         # Check if shorebird.yaml exists
         if [ ! -f "$workingDir/shorebird.yaml" ]; then
             echo "Error: shorebird.yaml file is required when useShorebird is true"
@@ -122,12 +120,20 @@ validate_android_inputs() {
 
 }
 
+validate_bundle_identifier() {
+    if [ -z "$bundleIdentifier" ]; then
+        echo "Error: bundleIdentifier is required for iOS builds"
+        exit 1
+    fi
+}
+
 # Main function to run all validations
 main() {
     validate_common_inputs
     validate_shorebird_requirements
 
     if [ "$platform" == "ios" ]; then
+        validate_bundle_identifier
         validate_ios_inputs
     elif [ "$platform" == "android" ]; then
         validate_android_inputs
