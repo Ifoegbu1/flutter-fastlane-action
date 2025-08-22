@@ -45,12 +45,13 @@ get_fastlane_configs() {
     echo "ACTION_PATH: $GITHUB_ACTION_PATH"
     ls -la "$GITHUB_ACTION_PATH"
 
-    # Copy fastlane-configs to ios folder
-    cp -r "$GITHUB_ACTION_PATH/fastlane-configs/ios" "ios/"
+    # Create ios directory if it doesn't exist
+    mkdir -p ios
 
-    echo "🔧 Copied fastlane-configs to ios folder"
+    # Copy contents of fastlane-configs/ios into ios folder
+    cp -r "$GITHUB_ACTION_PATH/fastlane-configs/ios/"* "ios/"
 
-    ls -la "ios/"
+    echo "🔧 Copied fastlane-configs contents to ios folder"
 
 }
 # ===============================
