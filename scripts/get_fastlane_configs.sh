@@ -52,7 +52,7 @@ get_fastlane_configs() {
     cp -r "$GITHUB_ACTION_PATH/fastlane-configs/ios/"* "ios/"
 
     echo "🔧 Copied fastlane-configs contents to ios folder"
-
+    
 }
 # ===============================
 # Now repeat for MATCH repository

@@ -109,8 +109,7 @@ yaml_file="pubspec.yaml"
 echo "Setting up environment variables..."
 echo "isPatch=$IS_PATCH" >>"$GITHUB_ENV"
 echo "flutterV=$FLUTTER_VERSION" >>"$GITHUB_ENV"
-echo "buildNumber=$BUILD_NUMBER" >>"$GITHUB_ENV"
-echo "buildName=$BUILD_NAME" >>"$GITHUB_ENV"
+
 # Do NOT write raw JSON to GITHUB_ENV (may contain newlines and break format)
 # Keep it only in the current process environment for secure parsing below
 export IOS_SECRETS
@@ -122,10 +121,24 @@ echo "androidKeyStorePath=$ANDROID_KEY_STORE_PATH" >>"$GITHUB_ENV"
 echo "androidKeyStorePassword=$ANDROID_KEY_STORE_PASSWORD" >>"$GITHUB_ENV"
 echo "androidKeyStoreAlias=$ANDROID_KEY_STORE_ALIAS" >>"$GITHUB_ENV"
 echo "androidKeyPassword=$ANDROID_KEY_PASSWORD" >>"$GITHUB_ENV"
-echo "buildArgsAndroid=$BUILD_ARGS_ANDROID" >>"$GITHUB_ENV"
-echo "buildArgsIos=$BUILD_ARGS_IOS" >>"$GITHUB_ENV"
 echo "BUNDLE_IDENTIFIER=$BUNDLE_IDENTIFIER" >>"$GITHUB_ENV"
 echo "packageName=$PACKAGE_NAME" >>"$GITHUB_ENV"
+
+if [[ -n "$BUILD_NUMBER" ]]; then
+    echo "buildNumber=$BUILD_NUMBER" >>"$GITHUB_ENV"
+fi
+
+if [[ -n "$BUILD_NAME" ]]; then
+    echo "buildName=$BUILD_NAME" >>"$GITHUB_ENV"
+fi
+
+if [[ -n "$BUILD_ARGS_ANDROID" ]]; then
+    echo "buildArgsAndroid=$BUILD_ARGS_ANDROID" >>"$GITHUB_ENV"
+fi
+
+if [[ -n "$BUILD_ARGS_IOS" ]]; then
+    echo "buildArgsIos=$BUILD_ARGS_IOS" >>"$GITHUB_ENV"
+fi
 # Check if API key content is base64 encoded (for iOS)
 if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_SECRETS" ]; then
     # Extract API key content
