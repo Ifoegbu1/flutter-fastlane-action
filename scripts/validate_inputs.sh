@@ -187,6 +187,7 @@ validate_android_inputs() {
 
 # Main function to run all validations
 main() {
+    echo "📋 Validating inputs..."
     validate_common_inputs
     validate_shorebird_requirements
 
