@@ -25,7 +25,7 @@ cleanup() {
 trap cleanup EXIT
 
 FLUTTER_VERSION="$flutterV"
-FLUTTER_CHANNEL="stable"
+FLUTTER_CHANNEL="$flutterChannel"
 PLATFORM=$(uname -s)
 INSTALL_DIR="$(dirname "$RUNNER_WORKSPACE")/flutter/$FLUTTER_VERSION"
 FLUTTER_BIN="$INSTALL_DIR/bin"

@@ -38,6 +38,10 @@ inputs:
     description: "Flutter version to use"
     required: false
     default: "3.27.4"
+  flutterChannel:
+    description: "Flutter channel to use"
+    required: false
+    default: "stable"
   shorebirdToken:
     description: "Shorebird token to use"
     required: false
@@ -92,6 +96,7 @@ runs:
         ${{ github.action_path }}/scripts/setup_env_vars.sh \
           --is-patch "${{ inputs.isPatch }}" \
           --flutter-version "${{ inputs.flutterVersion }}" \
+          --flutter-channel "${{ inputs.flutterChannel }}" \
           --build-name "${{ inputs.buildName }}" \
           --build-number "${{ inputs.buildNumber }}" \
           --platform "${{ inputs.platform }}" \

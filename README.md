@@ -125,6 +125,7 @@ steps:
 | `iosDistributionJson`         | Yes (for iOS)     | -          | JSON containing iOS distribution secrets           |
 | `isPatch`                     | No                | `false`    | Whether to use shorebird patch build               |
 | `flutterVersion`              | No                | `3.27.4`   | Flutter version to use                             |
+| `flutterChannel`              | No                | `stable`   | Flutter channel to use                             |
 | `shorebirdToken`              | No                | -          | Shorebird token (required if useShorebird is true) |
 | `useShorebird`                | No                | `false`    | Whether to use shorebird                           |
 | `javaVersion`                 | No                | `17`       | Java version to use                                |

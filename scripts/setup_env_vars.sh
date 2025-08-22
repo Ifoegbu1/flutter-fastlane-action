@@ -4,6 +4,7 @@ set -e
 # Default values
 IS_PATCH=""
 FLUTTER_VERSION=""
+FLUTTER_CHANNEL=""
 BUILD_NAME=""
 BUILD_NUMBER=""
 IOS_SECRETS=""
@@ -30,6 +31,10 @@ while [[ $# -gt 0 ]]; do
         ;;
     --flutter-version)
         FLUTTER_VERSION="$2"
+        shift 2
+        ;;
+    --flutter-channel)
+        FLUTTER_CHANNEL="$2"
         shift 2
         ;;
     --build-name)
@@ -109,6 +114,7 @@ yaml_file="pubspec.yaml"
 echo "Setting up environment variables..."
 echo "isPatch=$IS_PATCH" >>"$GITHUB_ENV"
 echo "flutterV=$FLUTTER_VERSION" >>"$GITHUB_ENV"
+echo "flutterChannel=$FLUTTER_CHANNEL" >>"$GITHUB_ENV"
 
 # Do NOT write raw JSON to GITHUB_ENV (may contain newlines and break format)
 # Keep it only in the current process environment for secure parsing below
@@ -180,8 +186,7 @@ fi
 echo "✅ Environment variables set successfully."
 echo ""
 echo "📋 Summary:"
+echo "  - flutterVersion: $FLUTTER_VERSION"
 echo "  - platform: $PLATFORM"
 echo "  - isPatch: $IS_PATCH"
-echo "  - flutterV: $FLUTTER_VERSION"
 echo "  - useShorebird: $USE_SHOREBIRD"
-echo "  - releaseV: $releaseV"
