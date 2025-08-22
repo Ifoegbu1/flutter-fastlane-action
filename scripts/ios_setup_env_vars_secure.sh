@@ -10,7 +10,7 @@ fi
 TEMP_FILE=$(mktemp) || STATUS=$?
 chmod 600 "$TEMP_FILE" || STATUS=$?
 
-echo "$IOS_SECRETS" | jq -r 'del(.MATCH_GIT_SSH_KEY) | to_entries[] | "\(.key)=\(.value)"' >"$TEMP_FILE" || STATUS=$?
+echo "$IOS_SECRETS" | jq -r 'to_entries[] | "\(.key)=\(.value)"' >"$TEMP_FILE" || STATUS=$?
 
 while IFS='=' read -r key value; do
     if [[ -n "$key" && -n "$value" ]]; then

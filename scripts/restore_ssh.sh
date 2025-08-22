@@ -5,8 +5,6 @@ restore_ssh() {
         rm -rf ~/.ssh
         mv "$SSH_BACKUP_DIR" ~/.ssh
         echo "   -🔐 Restored entire .ssh directory from backup"
-    else
-        echo "No backup directory found"
     fi
 
 }
