@@ -38,8 +38,7 @@ shorebird_update() {
     if [ $BUILD_EXIT_CODE -eq 0 ]; then
         echo "✅ Shorebird release completed successfully."
 
-        # Sign the AAB file if keystore is provided
-
+    else
         echo "❌ Shorebird release failed with exit code $BUILD_EXIT_CODE. Skipping signing."
         exit $BUILD_EXIT_CODE
     fi
