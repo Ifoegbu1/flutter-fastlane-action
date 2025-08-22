@@ -150,9 +150,12 @@ fi
 
 releaseV=$(grep 'version:' "$yaml_file" | awk '{print $2}')
 echo "releaseV=$releaseV" >>"$GITHUB_ENV"
+ls -la "$GITHUB_ACTION_PATH/scripts"
 # Execute platform-specific setup scripts
 if [ "$platform" == "ios" ]; then
     echo "Setting up iOS environment variables..."
+    bash "$GITHUB_ACTION_PATH/scripts/ios_setup_env_vars_secure.sh"
+
 #    "$GITHUB_ACTION_PATH"/scripts/ios_setup_env_vars_secure.sh
 
 fi
