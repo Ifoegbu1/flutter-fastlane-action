@@ -7,12 +7,12 @@ set -e
 # Function to validate common inputs
 validate_common_inputs() {
     if [ -z "$platform" ]; then
-        echo "Error: platform is required"
+        echo "❌ Error: platform is required"
         exit 1
     fi
 
     if [[ "$platform" != "ios" && "$platform" != "android" ]]; then
-        echo "Error: platform must be 'ios' or 'android'"
+        echo "❌ Error: platform must be 'ios' or 'android'"
         exit 1
     fi
 }
@@ -20,23 +20,17 @@ validate_common_inputs() {
 # Function to validate iOS inputs
 validate_ios_inputs() {
     # First check for iOS-specific requirements
-    if [ -z "$IOS_SECRETS" ]; then
-        echo "Error: iosDistributionJson is required for iOS builds"
+    if [ "$hasIosSecrets" != "true" ]; then
+        echo "❌ Error: iosDistributionJson is required for iOS builds"
         exit 1
     fi
 
     if [ -z "$bundleIdentifier" ]; then
-        echo "Error: bundleIdentifier is required for iOS builds"
+        echo "❌ Error: bundleIdentifier is required for iOS builds"
         exit 1
     fi
 
-    # Validate JSON format
-    if ! echo "$IOS_SECRETS" | jq -e . >/dev/null 2>&1; then
-        echo "Error: iosDistributionJson is not valid JSON"
-        exit 1
-    fi
-
-    # Check for required keys in iOS secrets JSON
+    # Check for required environment variables (exported from ios_setup_env_vars_secure.sh)
     required_keys=(
         "TEAM_ID"
         "APPLE_ID"
@@ -48,47 +42,52 @@ validate_ios_inputs() {
         "MATCH_GIT_SSH_KEY"
     )
 
+    missing_keys=()
     for key in "${required_keys[@]}"; do
-        if ! echo "$IOS_SECRETS" | jq -e "has(\"$key\")" >/dev/null 2>&1 || [ "$(echo "$IOS_SECRETS" | jq -r ".[\"$key\"]")" == "null" ] || [ -z "$(echo "$IOS_SECRETS" | jq -r ".[\"$key\"]")" ]; then
-            echo "Error: Missing required key '$key' in iosDistributionJson"
-            exit 1
+        if [ -z "${!key:-}" ]; then
+            missing_keys+=("$key")
         fi
     done
 
+    if [ ${#missing_keys[@]} -gt 0 ]; then
+        echo "❌ Error: Missing required iOS environment variables in iosDistributionJson: ${missing_keys[*]}"
+        exit 1
+    fi
+
     # Ensure Android-specific parameters are not provided for iOS builds
     if [ -n "$androidKeyStorePath" ]; then
-        echo "Error: androidKeyStorePath should not be provided for iOS builds"
+        echo "❌ Error: androidKeyStorePath should not be provided for iOS builds"
         exit 1
     fi
 
     if [ -n "$androidKeyStorePassword" ]; then
-        echo "Error: androidKeyStorePassword should not be provided for iOS builds"
+        echo "❌ Error: androidKeyStorePassword should not be provided for iOS builds"
         exit 1
     fi
 
     if [ -n "$androidKeyStoreAlias" ]; then
-        echo "Error: androidKeyStoreAlias should not be provided for iOS builds"
+        echo "❌ Error: androidKeyStoreAlias should not be provided for iOS builds"
         exit 1
     fi
 
     if [ -n "$androidKeyPassword" ]; then
-        echo "Error: androidKeyPassword should not be provided for iOS builds"
+        echo "❌ Error: androidKeyPassword should not be provided for iOS builds"
         exit 1
     fi
 
     if [ "$hasServiceAccount" == "true" ]; then
-        echo "Error: serviceAccountJsonPlainText should not be provided for iOS builds"
+        echo "❌ Error: serviceAccountJsonPlainText should not be provided for iOS builds"
         exit 1
     fi
 
     if [ -n "$packageName" ]; then
-        echo "Error: packageName should not be provided for iOS builds"
+        echo "❌ Error: packageName should not be provided for iOS builds"
         exit 1
     fi
 
     # Check for any other Android-specific parameters
     if [ -n "$buildArgsAndroid" ]; then
-        echo "Error: androidBuildArgs should not be provided for iOS builds"
+        echo "❌ Error: androidBuildArgs should not be provided for iOS builds"
         exit 1
     fi
 }
@@ -96,22 +95,22 @@ validate_ios_inputs() {
 # Function to validate Android keystore information
 validate_android_keystore() {
     if [ -z "$androidKeyStorePath" ]; then
-        echo "Error: androidKeyStorePath is required for Android builds"
+        echo "❌ Error: androidKeyStorePath is required for Android builds"
         exit 1
     fi
 
     if [ -z "$androidKeyStorePassword" ]; then
-        echo "Error: androidKeyStorePassword is required for Android builds"
+        echo "❌ Error: androidKeyStorePassword is required for Android builds"
         exit 1
     fi
 
     if [ -z "$androidKeyStoreAlias" ]; then
-        echo "Error: androidKeyStoreAlias is required for Android builds"
+        echo "❌ Error: androidKeyStoreAlias is required for Android builds"
         exit 1
     fi
 
     if [ -z "$androidKeyPassword" ]; then
-        echo "Error: androidKeyPassword is required for Android builds"
+        echo "❌ Error: androidKeyPassword is required for Android builds"
         exit 1
     fi
 }
@@ -119,12 +118,12 @@ validate_android_keystore() {
 # Function to validate Google Play deployment requirements
 validate_google_play_requirements() {
     if [ "$hasServiceAccount" != "true" ]; then
-        echo "Error: serviceAccountJsonPlainText is required for Google Play deployment"
+        echo "❌ Error: serviceAccountJsonPlainText is required for Google Play deployment"
         exit 1
     fi
 
     if [ -z "$packageName" ]; then
-        echo "Error: packageName is required for Google Play deployment"
+        echo "❌ Error: packageName is required for Google Play deployment"
         exit 1
     fi
 }
@@ -133,20 +132,20 @@ validate_google_play_requirements() {
 validate_shorebird_requirements() {
     if [ "$isShorebird" == "true" ]; then
         if [ -z "$SHOREBIRD_TOKEN" ]; then
-            echo "Error: shorebirdToken is required when useShorebird is true"
+            echo "❌ Error: shorebirdToken is required when useShorebird is true"
             exit 1
         fi
 
         # Check if shorebird.yaml exists
         if [ ! -f "$workingDir/shorebird.yaml" ]; then
-            echo "Error: shorebird.yaml file is required when useShorebird is true"
+            echo "❌ Error: shorebird.yaml file is required when useShorebird is true"
             echo "Please run 'shorebird init' to create a shorebird.yaml file"
             exit 1
         fi
 
         # Check if shorebird.yaml contains app_id
         if ! grep -q "app_id:" "$workingDir/shorebird.yaml"; then
-            echo "Error: app_id is missing in shorebird.yaml"
+            echo "❌ Error: app_id is missing in shorebird.yaml"
             echo "Please ensure your shorebird.yaml contains an app_id key"
             exit 1
         fi
@@ -157,7 +156,7 @@ validate_shorebird_requirements() {
 validate_android_inputs() {
     # First check for Android-specific requirements
     if [ -z "$packageName" ]; then
-        echo "Error: packageName is required for Android builds"
+        echo "❌ Error: packageName is required for Android builds"
         exit 1
     fi
 
@@ -169,18 +168,18 @@ validate_android_inputs() {
 
     # Ensure iOS-specific parameters are not provided for Android builds
     if [ -n "$IOS_SECRETS" ]; then
-        echo "Error: iosDistributionJson should not be provided for Android builds"
+        echo "❌ Error: iosDistributionJson should not be provided for Android builds"
         exit 1
     fi
 
     if [ -n "$bundleIdentifier" ]; then
-        echo "Error: bundleIdentifier should not be provided for Android builds"
+        echo "❌ Error: bundleIdentifier should not be provided for Android builds"
         exit 1
     fi
 
     # Check for any other iOS-specific parameters
     if [ -n "$buildArgsIos" ]; then
-        echo "Error: iosBuildArgs should not be provided for Android builds"
+        echo "❌ Error: iosBuildArgs should not be provided for Android builds"
         exit 1
     fi
 }

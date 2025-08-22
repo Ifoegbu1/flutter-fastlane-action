@@ -111,7 +111,9 @@ echo "isPatch=$IS_PATCH" >>"$GITHUB_ENV"
 echo "flutterV=$FLUTTER_VERSION" >>"$GITHUB_ENV"
 echo "buildNumber=$BUILD_NUMBER" >>"$GITHUB_ENV"
 echo "buildName=$BUILD_NAME" >>"$GITHUB_ENV"
-echo "IOS_SECRETS=$IOS_SECRETS" >>"$GITHUB_ENV"
+# Do NOT write raw JSON to GITHUB_ENV (may contain newlines and break format)
+# Keep it only in the current process environment for secure parsing below
+export IOS_SECRETS
 echo "platform=$PLATFORM" >>"$GITHUB_ENV"
 echo "workingDir=$WORKING_DIRECTORY" >>"$GITHUB_ENV"
 echo "SHOREBIRD_TOKEN=$SHOREBIRD_TOKEN" >>"$GITHUB_ENV"
@@ -153,6 +155,10 @@ echo "releaseV=$releaseV" >>"$GITHUB_ENV"
 
 # Execute platform-specific setup scripts
 if [[ "$PLATFORM" == "ios" ]]; then
+    if [ -n "$IOS_SECRETS" ]; then
+        # Don't add service account JSON directly to environment - will be used directly in the action
+        echo "hasIosSecrets=true" >>"$GITHUB_ENV"
+    fi
     echo "Setting up iOS environment variables..."
     bash "$GITHUB_ACTION_PATH/scripts/ios_setup_env_vars_secure.sh"
 

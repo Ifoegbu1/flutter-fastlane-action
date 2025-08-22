@@ -15,9 +15,18 @@ echo "$IOS_SECRETS" | jq -r 'del(.MATCH_GIT_SSH_KEY) | to_entries[] | "\(.key)=\
 while IFS='=' read -r key value; do
     if [[ -n "$key" && -n "$value" ]]; then
         if [[ -n "$GITHUB_ENV" ]]; then
-
             echo "::add-mask::$value"
-            echo "$key=$value" >>"$GITHUB_ENV"
+            # Use multiline syntax if value contains a newline to avoid corrupting GITHUB_ENV
+            if printf '%s' "$value" | grep -q $'\n'; then
+                delimiter="EOF_$(date +%s%N)_$RANDOM"
+                {
+                    printf '%s<<%s\n' "$key" "$delimiter"
+                    printf '%s\n' "$value"
+                    printf '%s\n' "$delimiter"
+                } >>"$GITHUB_ENV"
+            else
+                echo "$key=$value" >>"$GITHUB_ENV"
+            fi
         else
 
             export "$key"="$value"
