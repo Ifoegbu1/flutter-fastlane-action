@@ -42,11 +42,12 @@ cleanup_ssh() {
 get_fastlane_configs() {
     echo "🔧 Getting Fastlane configs..."
 
-    ACTION_PATH="${GITHUB_ACTION_PATH}"
-    echo "ACTION_PATH: $ACTION_PATH"
+    echo "ACTION_PATH: $GITHUB_ACTION_PATH"
+    ls -la "$GITHUB_ACTION_PATH"
 
     # Copy fastlane-configs to ios folder
-    cp -r "$ACTION_PATH/fastlane-configs/ios" "ios/"
+    cp -r "$GITHUB_ACTION_PATH/fastlane-configs/ios" "ios/"
+
     echo "🔧 Copied fastlane-configs to ios folder"
 
 }
