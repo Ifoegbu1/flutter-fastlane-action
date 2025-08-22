@@ -141,10 +141,11 @@ if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_SECRETS" ]; then
         fi
     fi
 fi
-
-if [ -n "$SERVICE_ACCOUNT_JSON_PLAIN_TEXT" ]; then
-    # Don't add service account JSON directly to environment - will be used directly in the action
-    echo "hasServiceAccount=true" >>"$GITHUB_ENV"
+if [ "$PLATFORM" == "android" ]; then
+    if [ -n "$SERVICE_ACCOUNT_JSON_PLAIN_TEXT" ]; then
+        # Don't add service account JSON directly to environment - will be used directly in the action
+        echo "hasServiceAccount=true" >>"$GITHUB_ENV"
+    fi
 fi
 
 releaseV=$(grep 'version:' "$yaml_file" | awk '{print $2}')
@@ -152,14 +153,14 @@ echo "releaseV=$releaseV" >>"$GITHUB_ENV"
 # Execute platform-specific setup scripts
 if [ "$platform" == "ios" ]; then
     echo "Setting up iOS environment variables..."
-   "$GITHUB_ACTION_PATH"/scripts/ios_setup_env_vars_secure.sh
-
+#    "$GITHUB_ACTION_PATH"/scripts/ios_setup_env_vars_secure.sh
 
 fi
 
 echo "✅ Environment variables set successfully."
 echo ""
 echo "📋 Summary:"
+echo "  - platform: $PLATFORM"
 echo "  - isPatch: $IS_PATCH"
 echo "  - flutterV: $FLUTTER_VERSION"
 echo "  - useShorebird: $USE_SHOREBIRD"
