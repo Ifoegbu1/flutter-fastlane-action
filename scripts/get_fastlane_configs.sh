@@ -29,7 +29,6 @@ if ! command -v jq &>/dev/null; then
     exit 1
 fi
 
-
 # ===============================
 # Cleanup function for SSH restoration
 # ===============================
@@ -49,7 +48,6 @@ get_fastlane_configs() {
     # Copy fastlane-configs to ios folder
     cp -r "$ACTION_PATH/fastlane-configs/ios" "ios/"
     echo "🔧 Copied fastlane-configs to ios folder"
-
 
 }
 # ===============================
@@ -127,6 +125,7 @@ EOF
 }
 
 main() {
+    echo "🔧 Getting Fastlane configs..."
     backup_ssh && get_fastlane_configs && match_ssh
 
 }
