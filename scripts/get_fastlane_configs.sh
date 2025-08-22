@@ -18,10 +18,6 @@ set -euo pipefail
 # Extract values from secrets JSON
 # ===============================
 
-if [[ -z "${IOS_SECRETS:-}" ]]; then
-    echo "Error: IOS_SECRETS environment variable is not set"
-    exit 1
-fi
 
 # Check if jq is available
 if ! command -v jq &>/dev/null; then
@@ -33,52 +29,36 @@ fi
 # Cleanup function for SSH restoration
 # ===============================
 cleanup_ssh() {
-    echo "🧹 Cleaning up SSH configuration..."
+    # echo "🧹 Cleaning up SSH configuration..."
     rm -rf ~/.ssh
-    echo "   - Removed .ssh directory"
+    # echo "   - Removed .ssh directory"
 }
 
 # Write private key to file
 get_fastlane_configs() {
     echo "🔧 Getting Fastlane configs..."
 
-    echo "ACTION_PATH: $GITHUB_ACTION_PATH"
-    ls -la "$GITHUB_ACTION_PATH"
-
-    # Create ios directory if it doesn't exist
-    mkdir -p ios
-
     # Copy contents of fastlane-configs/ios into ios folder
     cp -r "$GITHUB_ACTION_PATH/fastlane-configs/ios/"* "ios/"
 
     echo "🔧 Copied fastlane-configs contents to ios folder"
-    
+
 }
-# ===============================
-# Now repeat for MATCH repository
-# ===============================
-
-# Call cleanup to reset SSH state
-# cleanup_ssh
-
-# ===============================
-# Setup SSH again for Match repo
-# ===============================
 
 # Backup entire .ssh directory if it exists
 backup_ssh() {
     SSH_BACKUP_DIR="$HOME/.ssh_backup_$(date +%s)"
     if [[ -d ~/.ssh ]]; then
         cp -r ~/.ssh "$SSH_BACKUP_DIR"
-        echo "💾 Backed up entire .ssh directory"
-    else
-        echo "No existing .ssh directory found"
+        # echo "💾 Backed up entire .ssh directory"
+    # else
+        # echo "No existing .ssh directory found"
     fi
 
     # Save backup dir to GitHub environment if running in GitHub Actions
     if [[ -n "${GITHUB_ENV:-}" ]]; then
         echo "SSH_BACKUP_DIR=$SSH_BACKUP_DIR" >>"$GITHUB_ENV"
-        echo "Saved backup dir to GitHub environment"
+        # echo "Saved backup dir to GitHub environment"
     fi
 }
 
@@ -86,14 +66,6 @@ match_ssh() {
     mkdir -p ~/.ssh
     chmod 700 ~/.ssh
     echo "🔐 Setting up SSH configuration for Match..."
-
-    # Extract Match SSH key and repo URL from JSON
-    MATCH_GIT_SSH_KEY=$(echo "$IOS_SECRETS" | jq -r '.MATCH_GIT_SSH_KEY')
-
-    if [[ "$MATCH_GIT_SSH_KEY" == "null" ]] || [[ -z "$MATCH_GIT_SSH_KEY" ]]; then
-        echo "Error: MATCH_GIT_SSH_KEY not found in IOS_SECRETS"
-        exit 1
-    fi
 
     # Write private key to file
     SSH_KEY_FILE="$HOME/.ssh/id_match"

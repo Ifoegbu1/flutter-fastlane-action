@@ -149,10 +149,10 @@ if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_SECRETS" ]; then
         # Try to decode and see if it's valid base64
         if echo "$API_KEY_CONTENT" | base64 -d >/dev/null 2>&1; then
             echo "isKeyBase64=true" >>"$GITHUB_ENV"
-            echo "API key content is base64 encoded"
+            # echo "APP_STORE_CONNECT_API_KEY_CONTENT is base64 encoded"
         else
             echo "isKeyBase64=false" >>"$GITHUB_ENV"
-            echo "API key content is not base64 encoded"
+            # echo "APP_STORE_CONNECT_API_KEY_CONTENT is not base64 encoded"
         fi
     fi
 fi
@@ -175,8 +175,6 @@ if [[ "$PLATFORM" == "ios" ]]; then
     echo "Setting up iOS environment variables..."
     bash "$GITHUB_ACTION_PATH/scripts/ios_setup_env_vars_secure.sh"
 
-#    "$GITHUB_ACTION_PATH"/scripts/ios_setup_env_vars_secure.sh
-
 fi
 
 echo "✅ Environment variables set successfully."
@@ -187,4 +185,3 @@ echo "  - isPatch: $IS_PATCH"
 echo "  - flutterV: $FLUTTER_VERSION"
 echo "  - useShorebird: $USE_SHOREBIRD"
 echo "  - releaseV: $releaseV"
-echo "  - TEAM_ID: $TEAM_ID"

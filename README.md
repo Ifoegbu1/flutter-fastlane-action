@@ -80,6 +80,8 @@ To set up SSH deploy keys for your Match repository:
 
 ### iOS Usage
 
+> **IMPORTANT**: This action deploys iOS apps to TestFlight only, not directly to the App Store. It is strongly recommended to release on TestFlight first, thoroughly test and review your app, and then manually submit for App Store review through App Store Connect.
+
 ```yaml
 steps:
   - name: Checkout code
@@ -464,6 +466,7 @@ jobs:
    - Verify your App Store Connect API key has sufficient permissions
    - Ensure your bundle identifier matches what's registered in App Store Connect
    - Check that your app version and build number are not already in use
+   - Remember that this action only deploys to TestFlight - after testing, you must manually submit for App Store review through App Store Connect
 
 3. **Fastlane errors:**
    - Ensure your fastlane installation is properly set up in your iOS folder
