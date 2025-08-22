@@ -94,7 +94,6 @@ runs:
           --flutter-version "${{ inputs.flutterVersion }}" \
           --build-name "${{ inputs.buildName }}" \
           --build-number "${{ inputs.buildNumber }}" \
-          --ios-secrets '${{ inputs.iosDistributionJson }}' \
           --platform "${{ inputs.platform }}" \
           --working-directory "${{ inputs.workingDirectory }}" \
           --shorebird-token "${{ inputs.shorebirdToken }}" \
@@ -107,7 +106,8 @@ runs:
           --build-args-android "${{ inputs.androidBuildArgs }}" \
           --build-args-ios "${{ inputs.iosBuildArgs }}" \
           --bundle-identifier "${{ inputs.bundleIdentifier }}" \
-          --service-account-json '${{ inputs.serviceAccountJsonPlainText }}' 
+          --service-account-json '${{ inputs.serviceAccountJsonPlainText }}' \
+          --ios-secrets '${{ inputs.iosDistributionJson }}'
 
     - name: Validate Required Inputs
       shell: bash

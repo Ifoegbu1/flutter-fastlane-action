@@ -19,8 +19,14 @@ validate_common_inputs() {
 
 # Function to validate iOS inputs
 validate_ios_inputs() {
+    # First check for iOS-specific requirements
     if [ -z "$IOS_SECRETS" ]; then
         echo "Error: iosDistributionJson is required for iOS builds"
+        exit 1
+    fi
+
+    if [ -z "$bundleIdentifier" ]; then
+        echo "Error: bundleIdentifier is required for iOS builds"
         exit 1
     fi
 
@@ -48,6 +54,43 @@ validate_ios_inputs() {
             exit 1
         fi
     done
+
+    # Ensure Android-specific parameters are not provided for iOS builds
+    if [ -n "$androidKeyStorePath" ]; then
+        echo "Error: androidKeyStorePath should not be provided for iOS builds"
+        exit 1
+    fi
+
+    if [ -n "$androidKeyStorePassword" ]; then
+        echo "Error: androidKeyStorePassword should not be provided for iOS builds"
+        exit 1
+    fi
+
+    if [ -n "$androidKeyStoreAlias" ]; then
+        echo "Error: androidKeyStoreAlias should not be provided for iOS builds"
+        exit 1
+    fi
+
+    if [ -n "$androidKeyPassword" ]; then
+        echo "Error: androidKeyPassword should not be provided for iOS builds"
+        exit 1
+    fi
+
+    if [ "$hasServiceAccount" == "true" ]; then
+        echo "Error: serviceAccountJsonPlainText should not be provided for iOS builds"
+        exit 1
+    fi
+
+    if [ -n "$packageName" ]; then
+        echo "Error: packageName should not be provided for iOS builds"
+        exit 1
+    fi
+
+    # Check for any other Android-specific parameters
+    if [ -n "$buildArgsAndroid" ]; then
+        echo "Error: androidBuildArgs should not be provided for iOS builds"
+        exit 1
+    fi
 }
 
 # Function to validate Android keystore information
@@ -112,17 +155,32 @@ validate_shorebird_requirements() {
 
 # Function to validate Android inputs
 validate_android_inputs() {
+    # First check for Android-specific requirements
+    if [ -z "$packageName" ]; then
+        echo "Error: packageName is required for Android builds"
+        exit 1
+    fi
+
     # Always validate keystore information
     validate_android_keystore
 
     # Always validate Google Play deployment requirements
     validate_google_play_requirements
 
-}
+    # Ensure iOS-specific parameters are not provided for Android builds
+    if [ -n "$IOS_SECRETS" ]; then
+        echo "Error: iosDistributionJson should not be provided for Android builds"
+        exit 1
+    fi
 
-validate_bundle_identifier() {
-    if [ -z "$bundleIdentifier" ]; then
-        echo "Error: bundleIdentifier is required for iOS builds"
+    if [ -n "$bundleIdentifier" ]; then
+        echo "Error: bundleIdentifier should not be provided for Android builds"
+        exit 1
+    fi
+
+    # Check for any other iOS-specific parameters
+    if [ -n "$buildArgsIos" ]; then
+        echo "Error: iosBuildArgs should not be provided for Android builds"
         exit 1
     fi
 }
@@ -133,7 +191,6 @@ main() {
     validate_shorebird_requirements
 
     if [ "$platform" == "ios" ]; then
-        validate_bundle_identifier
         validate_ios_inputs
     elif [ "$platform" == "android" ]; then
         validate_android_inputs
