@@ -50,6 +50,8 @@ get_fastlane_configs() {
 
     echo "🔧 Copied fastlane-configs to ios folder"
 
+    ls -la "ios/"
+
 }
 # ===============================
 # Now repeat for MATCH repository
