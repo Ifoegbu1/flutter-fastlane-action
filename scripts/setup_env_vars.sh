@@ -152,8 +152,8 @@ echo "releaseV=$releaseV" >>"$GITHUB_ENV"
 # Execute platform-specific setup scripts
 if [ "$PLATFORM" == "ios" ]; then
     echo "Setting up iOS environment variables..."
-    "$(dirname "$0")/ios_setup_env_vars_secure.sh"
-    
+    "$GITHUB_ACTION_PATH/scripts/ios_setup_env_vars_secure.sh"
+
 fi
 
 echo "✅ Environment variables set successfully."
