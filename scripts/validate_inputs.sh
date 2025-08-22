@@ -4,6 +4,37 @@ set -e
 # Using environment variables from setup_env_vars.sh
 # No parameters needed
 
+# Function to show documentation reference on error
+show_docs_reference() {
+    local exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+        echo ""
+        echo "ℹ️ For detailed information about required parameters, please refer to the Input Parameters section in the README.md:"
+        echo "https://github.com/Ifoegbu1/flutter-fastlane-action#input-parameters"
+
+        # Show platform-specific sections if applicable
+        if [ "$platform" == "ios" ]; then
+            echo ""
+            echo " For iOS-specific setup, see:"
+            echo "- iOS Requirements: https://github.com/Ifoegbu1/flutter-fastlane-action#ios-requirements"
+            echo "- iOS Distribution JSON Format: https://github.com/Ifoegbu1/flutter-fastlane-action#ios-distribution-json-format"
+            echo ""
+            echo "NOTE: This action deploys iOS apps to TestFlight only, not directly to the App Store."
+            echo "It is strongly recommended to release on TestFlight first, thoroughly test and review your app,"
+            echo "and then manually submit for App Store review through App Store Connect."
+        elif [ "$platform" == "android" ]; then
+            echo ""
+            echo "🤖 For Android-specific setup, see:"
+            echo "- Android Requirements: https://github.com/Ifoegbu1/flutter-fastlane-action#android-requirements"
+            echo "- Android Setup: https://github.com/Ifoegbu1/flutter-fastlane-action#android-setup"
+        fi
+    fi
+    exit $exit_code
+}
+
+# Set up trap to show documentation reference when validation fails
+trap show_docs_reference EXIT
+
 # Function to validate common inputs
 validate_common_inputs() {
     if [ -z "$platform" ]; then
@@ -197,6 +228,8 @@ main() {
     fi
 
     echo "✅ All required inputs are present"
+    # Remove the trap since validation was successful
+    trap - EXIT
 }
 
 # Run the main function
