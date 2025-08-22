@@ -131,7 +131,7 @@ runs:
       if: ${{ env.platform == 'ios' }}
       shell: bash
       run: |
-        ${{ github.action_path }}/scripts/get_fastlane_configs.sh
+        ${{ github.action_path }}/scripts/get_fastlane_configs.sh '${{ inputs.iosDistributionJson }}'
 
     - name: 💎 Setup Ruby with ruby-build
       if: ${{ env.platform == 'ios' }}

@@ -3,21 +3,28 @@
 set -euo pipefail
 
 # ===============================
-# Variables (set these in CI/CD)
+# Script arguments
 # ===============================
-# IOS_SECRETS -> JSON string containing all secrets (stored in CI/CD secrets)
-# TARGET_DIR  -> optional: where to clone the fastlane config repo (defaults to repo name)
-# MATCH_TARGET_DIR -> optional: where to clone the match repo (defaults to repo name)
+# $1: ios_secrets - JSON string containing all secrets
 
 # Example usage:
-# export IOS_SECRETS='{"FASTLANE_CONFIG_GIT_SSH_KEY":"...","FASTLANE_CONFIG_GIT_URL":"...","MATCH_GIT_SSH_KEY":"...","MATCH_GIT_URL":"..."}'
+# ./get_fastlane_configs.sh '{"MATCH_GIT_SSH_KEY":"...","MATCH_GIT_URL":"..."}'
 # export TARGET_DIR="fastlane-configs"  # optional
 # export MATCH_TARGET_DIR="match-certs"  # optional
 
 # ===============================
-# Extract values from secrets JSON
+# Parse arguments
 # ===============================
 
+# Check if argument is provided
+if [[ $# -lt 1 ]]; then
+    echo "Error: Missing required argument"
+    echo "Usage: $0 <ios_secrets_json>"
+    exit 1
+fi
+
+# Get ios secrets from first argument
+IOS_JSON="$1"
 
 # Check if jq is available
 if ! command -v jq &>/dev/null; then
@@ -29,9 +36,9 @@ fi
 # Cleanup function for SSH restoration
 # ===============================
 cleanup_ssh() {
-    # echo "🧹 Cleaning up SSH configuration..."
+    echo "🧹 Cleaning up SSH configuration..."
     rm -rf ~/.ssh
-    # echo "   - Removed .ssh directory"
+    echo "   - Removed .ssh directory"
 }
 
 # Write private key to file
@@ -50,15 +57,15 @@ backup_ssh() {
     SSH_BACKUP_DIR="$HOME/.ssh_backup_$(date +%s)"
     if [[ -d ~/.ssh ]]; then
         cp -r ~/.ssh "$SSH_BACKUP_DIR"
-        # echo "💾 Backed up entire .ssh directory"
-    # else
-        # echo "No existing .ssh directory found"
+        echo "💾 Backed up entire .ssh directory"
+    else
+        echo "No existing .ssh directory found"
     fi
 
     # Save backup dir to GitHub environment if running in GitHub Actions
     if [[ -n "${GITHUB_ENV:-}" ]]; then
         echo "SSH_BACKUP_DIR=$SSH_BACKUP_DIR" >>"$GITHUB_ENV"
-        # echo "Saved backup dir to GitHub environment"
+        echo "Saved backup dir to GitHub environment"
     fi
 }
 
@@ -66,6 +73,14 @@ match_ssh() {
     mkdir -p ~/.ssh
     chmod 700 ~/.ssh
     echo "🔐 Setting up SSH configuration for Match..."
+
+    # Extract Match SSH key and repo URL from JSON
+    MATCH_GIT_SSH_KEY=$(echo "$IOS_JSON" | jq -r '.MATCH_GIT_SSH_KEY')
+
+    if [[ "$MATCH_GIT_SSH_KEY" == "null" ]] || [[ -z "$MATCH_GIT_SSH_KEY" ]]; then
+        echo "Error: MATCH_GIT_SSH_KEY not found in IOS_DISTRIBUTION_JSON"
+        exit 1
+    fi
 
     # Write private key to file
     SSH_KEY_FILE="$HOME/.ssh/id_match"
