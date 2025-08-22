@@ -16,7 +16,7 @@ shorebird_patch() {
 
 shorebird_update() {
     echo "🎯 SHOREBIRD UPDATE OPERATION INITIATED."
-    flutter_args="--no-tree-shake-icons --dart-define=ENVIRONMENT=$ENVIRONMENT --obfuscate --split-debug-info=build/"
+    flutter_args="--no-tree-shake-icons --obfuscate --split-debug-info=build/"
 
     # Add build-name and build-number if available
     if [ -n "$buildName" ]; then
