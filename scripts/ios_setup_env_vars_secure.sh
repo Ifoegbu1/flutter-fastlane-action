@@ -16,12 +16,12 @@ while IFS='=' read -r key value; do
     if [[ -n "$key" && -n "$value" ]]; then
         if [[ -n "$GITHUB_ENV" ]]; then
 
-            echo "$value" | tr -d '\n' | xargs -0 -I {} echo "::add-mask::{}" || STATUS=$?
-            echo "$key=$value" >>"$GITHUB_ENV" || STATUS=$?
+            echo "::add-mask::$value"
+            echo "$key=$value" >>"$GITHUB_ENV"
         else
 
-            export "$key"="$value" || STATUS=$?
-            echo "Exported: $key=[MASKED]" || STATUS=$?
+            export "$key"="$value"
+            echo "Exported: $key=[MASKED]"
         fi
     fi
 done <"$TEMP_FILE"
