@@ -38,8 +38,7 @@ validate_ios_inputs() {
         "APP_STORE_CONNECT_API_ISSUER_ID"
         "APP_STORE_CONNECT_API_KEY_ID"
         "APP_STORE_CONNECT_API_KEY_CONTENT"
-        "SIGNING_GIT_URL"
-        "FASTLANE_CONFIG_GIT_URL"
+        "MATCH_SIGNING_GIT_URL"
         "MATCH_PASSWORD"
         "MATCH_GIT_SSH_KEY"
     )

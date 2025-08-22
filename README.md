@@ -54,14 +54,15 @@ A GitHub Action to build and deploy Flutter apps using Fastlane (for iOS) and Sh
 
    Remember this password as you'll need to add it to your `IOS_DISTRIBUTION_JSON` as the `MATCH_PASSWORD`.
 
-4. **Set up SSH deploy keys for your Match repository**:
-   - Generate an SSH key pair:
-     ```bash
-     ssh-keygen -t ed25519 -C "your_email@example.com" -f ./match_deploy_key
-     ```
-   - Add the public key (`match_deploy_key.pub`) to your Match repository's deploy keys in GitHub
-   - Add the private key content to your `IOS_DISTRIBUTION_JSON` as the `MATCH_GIT_SSH_KEY`
-   - For more details, see [How to Use GitHub Deploy Keys](https://dylancastillo.co/posts/how-to-use-github-deploy-keys.html)
+<a name="ssh-deploy-keys"></a> 4. **Set up SSH deploy keys for your Match repository(MATCH_SIGNING_GIT_URL)**:
+
+- Generate an SSH key pair:
+  ```bash
+  ssh-keygen -t ed25519 -C "your_email@example.com" -f ./match_deploy_key
+  ```
+- Add the public key (`match_deploy_key.pub`) to your Match repository's deploy keys in GitHub
+- Add the private key content to your `IOS_DISTRIBUTION_JSON` as the `MATCH_GIT_SSH_KEY`
+- For more details, see [How to Use GitHub Deploy Keys](https://dylancastillo.co/posts/how-to-use-github-deploy-keys.html)
 
 ### Android Requirements
 
@@ -133,7 +134,7 @@ The `iosDistributionJson` parameter should contain a JSON object with the follow
   "APP_STORE_CONNECT_API_ISSUER_ID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   "APP_STORE_CONNECT_API_KEY_ID": "ABCDE12345",
   "APP_STORE_CONNECT_API_KEY_CONTENT": "BASE64_ENCODED_KEY_CONTENT",
-  "SIGNING_GIT_URL": "git@github.com:username/ios-signing.git",
+  "MATCH_SIGNING_GIT_URL": "git@github.com:username/ios-signing.git",
   "MATCH_PASSWORD": "your-match-password",
   "MATCH_GIT_SSH_KEY": "YOUR_SSH_PRIVATE_KEY"
 }
@@ -141,17 +142,17 @@ The `iosDistributionJson` parameter should contain a JSON object with the follow
 
 ### Required iOS Distribution JSON Fields
 
-| Field                               | Description                                                      |
-| ----------------------------------- | ---------------------------------------------------------------- |
-| `BUNDLE_IDENTIFIER`                 | iOS app bundle identifier                                        |
-| `TEAM_ID`                           | Apple Developer Team ID                                          |
-| `APPLE_ID`                          | Apple ID email                                                   |
-| `APP_STORE_CONNECT_API_ISSUER_ID`   | App Store Connect API issuer ID                                  |
-| `APP_STORE_CONNECT_API_KEY_ID`      | App Store Connect API key ID                                     |
-| `APP_STORE_CONNECT_API_KEY_CONTENT` | App Store Connect API key content (can be Base64-encoded or not) |
-| `SIGNING_GIT_URL`                   | Git URL for iOS signing repository                               |
-| `MATCH_PASSWORD`                    | Password for Match                                               |
-| `MATCH_GIT_SSH_KEY`                 | SSH key for accessing Match repository                           |
+| Field                               | Description                                                                                                                                                               |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `BUNDLE_IDENTIFIER`                 | iOS app bundle identifier                                                                                                                                                 |
+| `TEAM_ID`                           | Apple Developer Team ID                                                                                                                                                   |
+| `APPLE_ID`                          | Apple ID email                                                                                                                                                            |
+| `APP_STORE_CONNECT_API_ISSUER_ID`   | App Store Connect API issuer ID                                                                                                                                           |
+| `APP_STORE_CONNECT_API_KEY_ID`      | App Store Connect API key ID                                                                                                                                              |
+| `APP_STORE_CONNECT_API_KEY_CONTENT` | App Store Connect API key content (can be Base64-encoded or not)                                                                                                          |
+| `MATCH_SIGNING_GIT_URL`             | SSH git URL for iOS signing repository (must start with `git@` and be accessible via SSH). See [Set up SSH deploy keys](#ssh-deploy-keys) section for setup instructions. |
+| `MATCH_PASSWORD`                    | Password for Match                                                                                                                                                        |
+| `MATCH_GIT_SSH_KEY`                 | SSH key for accessing Match repository                                                                                                                                    |
 
 ## Android Setup
 
@@ -394,7 +395,7 @@ jobs:
           useShorebird: true
           isPatch: true
           shorebirdToken: ${{ secrets.SHOREBIRD_TOKEN }}
-        
+
           # Other required parameters based on platform
 ```
 
@@ -406,7 +407,6 @@ jobs:
 - The example iOS Distribution JSON contains placeholder values - replace with your actual values
 - For iOS builds, the entire distribution JSON must be stored as a GitHub Secret
 - For Android builds, all keystore information and service account credentials must be stored as GitHub Secrets
-
 
 ## Troubleshooting
 
