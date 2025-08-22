@@ -198,12 +198,12 @@ validate_android_inputs() {
     validate_google_play_requirements
 
     # Ensure iOS-specific parameters are not provided for Android builds
-    if [ -n "$IOS_SECRETS" ]; then
+    if [ "$hasIosSecrets" == "true" ]; then
         echo "❌ Error: iosDistributionJson should not be provided for Android builds"
         exit 1
     fi
 
-    if [ -n "$bundleIdentifier" ]; then
+    if [ -n "$BUNDLE_IDENTIFIER" ]; then
         echo "❌ Error: bundleIdentifier should not be provided for Android builds"
         exit 1
     fi

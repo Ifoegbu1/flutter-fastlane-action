@@ -7,7 +7,7 @@ FLUTTER_VERSION=""
 FLUTTER_CHANNEL=""
 BUILD_NAME=""
 BUILD_NUMBER=""
-IOS_SECRETS=""
+IOS_JSON=""
 PLATFORM=""
 WORKING_DIRECTORY=""
 SHOREBIRD_TOKEN=""
@@ -46,7 +46,7 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
     --ios-secrets)
-        IOS_SECRETS="$2"
+        IOS_JSON="$2"
         shift 2
         ;;
     --platform)
@@ -118,7 +118,7 @@ echo "flutterChannel=$FLUTTER_CHANNEL" >>"$GITHUB_ENV"
 
 # Do NOT write raw JSON to GITHUB_ENV (may contain newlines and break format)
 # Keep it only in the current process environment for secure parsing below
-export IOS_SECRETS
+export IOS_JSON
 echo "platform=$PLATFORM" >>"$GITHUB_ENV"
 echo "workingDir=$WORKING_DIRECTORY" >>"$GITHUB_ENV"
 echo "SHOREBIRD_TOKEN=$SHOREBIRD_TOKEN" >>"$GITHUB_ENV"
@@ -146,9 +146,9 @@ if [[ -n "$BUILD_ARGS_IOS" ]]; then
     echo "buildArgsIos=$BUILD_ARGS_IOS" >>"$GITHUB_ENV"
 fi
 # Check if API key content is base64 encoded (for iOS)
-if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_SECRETS" ]; then
+if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_JSON" ]; then
     # Extract API key content
-    API_KEY_CONTENT=$(echo "$IOS_SECRETS" | jq -r '.APP_STORE_CONNECT_API_KEY_CONTENT // ""')
+    API_KEY_CONTENT=$(echo "$IOS_JSON" | jq -r '.APP_STORE_CONNECT_API_KEY_CONTENT // ""')
 
     # Check if the content is base64 encoded
     if [ -n "$API_KEY_CONTENT" ]; then
@@ -174,7 +174,7 @@ echo "releaseV=$releaseV" >>"$GITHUB_ENV"
 
 # Execute platform-specific setup scripts
 if [[ "$PLATFORM" == "ios" ]]; then
-    if [ -n "$IOS_SECRETS" ]; then
+    if [ -n "$IOS_JSON" ]; then
         # Don't add service account JSON directly to environment - will be used directly in the action
         echo "hasIosSecrets=true" >>"$GITHUB_ENV"
     fi
