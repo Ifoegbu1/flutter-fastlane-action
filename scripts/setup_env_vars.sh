@@ -141,7 +141,7 @@ if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_SECRETS" ]; then
         fi
     fi
 fi
-if [ "$PLATFORM" == "android" ]; then
+if [[ "$PLATFORM" == "android" ]]; then
     if [ -n "$SERVICE_ACCOUNT_JSON_PLAIN_TEXT" ]; then
         # Don't add service account JSON directly to environment - will be used directly in the action
         echo "hasServiceAccount=true" >>"$GITHUB_ENV"
@@ -150,9 +150,10 @@ fi
 
 releaseV=$(grep 'version:' "$yaml_file" | awk '{print $2}')
 echo "releaseV=$releaseV" >>"$GITHUB_ENV"
+echo "printing github action path"
 ls -la "$GITHUB_ACTION_PATH/scripts"
 # Execute platform-specific setup scripts
-if [ "$platform" == "ios" ]; then
+if [[ "$PLATFORM" == "ios" ]]; then
     echo "Setting up iOS environment variables..."
     bash "$GITHUB_ACTION_PATH/scripts/ios_setup_env_vars_secure.sh"
 
