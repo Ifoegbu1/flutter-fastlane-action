@@ -25,7 +25,7 @@ validate_ios_inputs() {
         exit 1
     fi
 
-    if [ -z "$bundleIdentifier" ]; then
+    if [ -z "$BUNDLE_IDENTIFIER" ]; then
         echo "❌ Error: bundleIdentifier is required for iOS builds"
         exit 1
     fi
