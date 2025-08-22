@@ -11,8 +11,7 @@ shorebird_build() {
 }
 shorebird_patch() {
     echo "🎯 SHOREBIRD PATCH OPERATION INITIATED."
-    build_args="--platforms=android --release-version=\"$releaseV\" --allow-asset-diffs"
-    shorebird patch "$build_args"
+   shorebird patch --platforms=android --release-version="$releaseV" --allow-asset-diffs
 }
 
 shorebird_update() {
