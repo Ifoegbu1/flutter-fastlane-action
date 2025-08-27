@@ -84,9 +84,10 @@ else
 
   # Install ruby-build locally
   echo "Setting up ruby-build locally..."
-  RUBY_BUILD_DIR="${HOME}/.ruby-build"
+  RUBY_BUILD_DIR="${HOME}/.ruby-build-local"
   rm -rf "${RUBY_BUILD_DIR}" || true
   git clone https://github.com/rbenv/ruby-build.git "${RUBY_BUILD_DIR}"
+  git -C "${RUBY_BUILD_DIR}" pull
 
   # Create directory if it doesn't exist
   mkdir -p "${RUBY_INSTALL_PATH}"
