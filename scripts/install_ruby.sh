@@ -3,7 +3,7 @@
 
 # Parse command line arguments
 RUBY_VERSION="3.1.2"
-INSTALL_BASE_DIR="${HOME}/.ruby-installations"
+INSTALL_BASE_DIR="${HOME}/.ruby-installations-local"
 
 # Display help
 show_help() {
@@ -103,8 +103,6 @@ fi
 
 # Add Ruby to PATH
 export PATH="${RUBY_INSTALL_PATH}/bin:$PATH"
-echo "Current PATH: $PATH"
-echo "which ruby: $(which ruby)"
 if [ -n "$GITHUB_PATH" ]; then
   echo "${RUBY_INSTALL_PATH}/bin" >>"$GITHUB_PATH"
   echo "Ruby path added to GITHUB_PATH for subsequent workflow steps"
@@ -113,18 +111,17 @@ echo "Ruby path added to PATH environment variable"
 
 # Verify Ruby installation
 echo "Verifying Ruby installation..."
-echo "Using Ruby at: ${RUBY_INSTALL_PATH}/bin/ruby"
-"${RUBY_INSTALL_PATH}/bin/ruby" --version
-"${RUBY_INSTALL_PATH}/bin/gem" --version
+ruby --version
+gem --version
 
 # Install bundler
 echo "Installing bundler..."
-"${RUBY_INSTALL_PATH}/bin/gem" install bundler
-"${RUBY_INSTALL_PATH}/bin/bundler" --version
+gem install bundler
+bundler --version
 
 # Configure bundler to use vendor/bundle by default (avoid deprecated --path flag)
 echo "Configuring bundler defaults..."
-"${RUBY_INSTALL_PATH}/bin/bundle" config set path "$(dirname "$RUNNER_WORKSPACE")/gems/vendor/bundle"
+bundle config set path "$(dirname "$RUNNER_WORKSPACE")/gems/vendor/bundle"
 # Use the dynamically defined Ruby path
 # No need to export PATH again as it was already set above on line 105
 echo "Script completed successfully"
