@@ -51,6 +51,8 @@ platform :ios do
         code_sign_identity: "Apple Distribution"
       )
 
+      sh "pod repo update"
+
       flutterV = ENV["flutterV"] 
       isPatch = ENV["isPatch"] || "false"
       isShorebird = ENV["isShorebird"] || "false"
