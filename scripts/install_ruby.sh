@@ -123,7 +123,15 @@ gem --version
 
 # Install bundler
 echo "Installing bundler..."
-gem install bundler --user-install
+# Get Ruby version and determine compatible bundler version
+RUBY_VERSION_CHECK=$(ruby -e 'puts RUBY_VERSION >= "3.2.0"')
+if [ "$RUBY_VERSION_CHECK" = "true" ]; then
+  echo "Ruby version >= 3.2.0, installing latest bundler..."
+  gem install bundler --user-install
+else
+  echo "Ruby version < 3.2.0, installing bundler 2.4.22..."
+  gem install bundler -v 2.4.22 --user-install
+fi
 bundler --version
 
 # Configure bundler to use vendor/bundle by default (avoid deprecated --path flag)
