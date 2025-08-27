@@ -103,6 +103,8 @@ fi
 
 # Add Ruby to PATH
 export PATH="${RUBY_INSTALL_PATH}/bin:$PATH"
+echo "Current PATH: $PATH"
+echo "which ruby: $(which ruby)"
 if [ -n "$GITHUB_PATH" ]; then
   echo "${RUBY_INSTALL_PATH}/bin" >>"$GITHUB_PATH"
   echo "Ruby path added to GITHUB_PATH for subsequent workflow steps"
@@ -111,17 +113,18 @@ echo "Ruby path added to PATH environment variable"
 
 # Verify Ruby installation
 echo "Verifying Ruby installation..."
-ruby --version
-gem --version
+echo "Using Ruby at: ${RUBY_INSTALL_PATH}/bin/ruby"
+"${RUBY_INSTALL_PATH}/bin/ruby" --version
+"${RUBY_INSTALL_PATH}/bin/gem" --version
 
 # Install bundler
 echo "Installing bundler..."
-gem install bundler
-bundler --version
+"${RUBY_INSTALL_PATH}/bin/gem" install bundler
+"${RUBY_INSTALL_PATH}/bin/bundler" --version
 
 # Configure bundler to use vendor/bundle by default (avoid deprecated --path flag)
 echo "Configuring bundler defaults..."
-bundle config set path "$(dirname "$RUNNER_WORKSPACE")/gems/vendor/bundle"
+"${RUBY_INSTALL_PATH}/bin/bundle" config set path "$(dirname "$RUNNER_WORKSPACE")/gems/vendor/bundle"
 # Use the dynamically defined Ruby path
 # No need to export PATH again as it was already set above on line 105
 echo "Script completed successfully"
