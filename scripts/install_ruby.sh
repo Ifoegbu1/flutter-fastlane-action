@@ -102,7 +102,8 @@ else
 fi
 
 # Add Ruby to PATH
-# export PATH="${RUBY_INSTALL_PATH}/bin:$PATH"
+export PATH="${RUBY_INSTALL_PATH}/bin:$PATH"
+echo "Ruby path added to current PATH environment variable"
 if [ -n "$GITHUB_PATH" ]; then
   echo "${RUBY_INSTALL_PATH}/bin" >>"$GITHUB_PATH"
   echo "Ruby path added to GITHUB_PATH for subsequent workflow steps"
@@ -118,19 +119,52 @@ echo "Ruby paths added to PATH environment variable"
 
 # Verify Ruby installation
 echo "Verifying Ruby installation..."
-ruby --version
+INSTALLED_RUBY_VERSION=$(ruby --version | cut -d' ' -f2 | cut -d'p' -f1)
+echo "Ruby version: ${INSTALLED_RUBY_VERSION}"
+echo "Expected Ruby version: ${RUBY_VERSION}"
+if [[ "${INSTALLED_RUBY_VERSION}" != "${RUBY_VERSION}"* ]]; then
+  echo "WARNING: The Ruby version being used (${INSTALLED_RUBY_VERSION}) doesn't match the expected version (${RUBY_VERSION})"
+  echo "This may indicate that the PATH is not set correctly or the installation failed."
+  echo "Using Ruby from: $(which ruby)"
+  echo "Checking if installation directory exists..."
+  if [ -d "${RUBY_INSTALL_PATH}/bin" ]; then
+    echo "Installation directory exists. Trying to use it directly..."
+    if [ -f "${RUBY_INSTALL_PATH}/bin/ruby" ]; then
+      echo "Using Ruby directly from installation path..."
+      "${RUBY_INSTALL_PATH}/bin/ruby" --version
+      export PATH="${RUBY_INSTALL_PATH}/bin:$PATH"
+    else
+      echo "Ruby binary not found in installation directory."
+    fi
+  else
+    echo "Installation directory does not exist or is not accessible."
+  fi
+fi
 gem --version
 
 # Install bundler
 echo "Installing bundler..."
-# Get Ruby version and determine compatible bundler version
-RUBY_VERSION_CHECK=$(ruby -e 'puts RUBY_VERSION >= "3.2.0"')
-if [ "$RUBY_VERSION_CHECK" = "true" ]; then
-  echo "Ruby version >= 3.2.0, installing latest bundler..."
-  gem install bundler --user-install
-else
-  echo "Ruby version < 3.2.0, installing bundler 2.4.22..."
-  gem install bundler -v 2.4.22 --user-install
+
+# Function to install the appropriate bundler version
+install_bundler() {
+  # Get Ruby version and determine compatible bundler version
+  local RUBY_VERSION_CHECK=$(ruby -e 'puts RUBY_VERSION >= "3.2.0"')
+  if [ "$RUBY_VERSION_CHECK" = "true" ]; then
+    echo "Ruby version >= 3.2.0, installing latest bundler..."
+    gem install bundler --user-install
+  else
+    echo "Ruby version < 3.2.0, installing bundler 2.4.22..."
+    gem install bundler -v 2.4.22 --user-install
+  fi
+}
+
+# Install bundler with current Ruby in PATH
+install_bundler
+
+# If the Ruby version was incorrect and we fixed the PATH, try installing bundler again
+if [[ "${INSTALLED_RUBY_VERSION}" != "${RUBY_VERSION}"* ]] && [ -f "${RUBY_INSTALL_PATH}/bin/ruby" ]; then
+  echo "Retrying bundler installation with corrected Ruby path..."
+  install_bundler
 fi
 bundler --version
 
