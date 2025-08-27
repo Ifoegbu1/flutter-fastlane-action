@@ -10,10 +10,10 @@ username(ENV["APPLE_ID"]) # Your Apple Developer Portal username
 
 team_id(ENV["TEAM_ID"])
 
-# clone_branch_directly(true)
+clone_branch_directly(true)
 
 readonly(false)
 
-# shallow_clone(true)
+shallow_clone(true)
 
-git_branch("master")
+git_branch(ENV["GIT_BRANCH"])

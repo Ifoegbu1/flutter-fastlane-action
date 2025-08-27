@@ -10,6 +10,10 @@ inputs:
     description: "Directory where your Flutter project is located"
     required: false
     default: "."
+  gitBranch:
+    description: "Git branch to use for fastlane match"
+    required: false
+    default: "master"
   platform:
     description: "Target platform (ios/android)"
     required: true
@@ -111,6 +115,7 @@ runs:
           --build-args-android "${{ inputs.androidBuildArgs }}" \
           --build-args-ios "${{ inputs.iosBuildArgs }}" \
           --bundle-identifier "${{ inputs.bundleIdentifier }}" \
+          --git-branch "${{ inputs.gitBranch }}" \
           --service-account-json '${{ inputs.serviceAccountJsonPlainText }}' \
           --ios-secrets '${{ inputs.iosDistributionJson }}'
 
