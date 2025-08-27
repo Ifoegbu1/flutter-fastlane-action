@@ -107,7 +107,14 @@ if [ -n "$GITHUB_PATH" ]; then
   echo "${RUBY_INSTALL_PATH}/bin" >>"$GITHUB_PATH"
   echo "Ruby path added to GITHUB_PATH for subsequent workflow steps"
 fi
-echo "Ruby path added to PATH environment variable"
+# Add Ruby user gems to PATH
+GEM_HOME=$(ruby -e 'puts Gem.user_dir')
+if [ -n "$GITHUB_PATH" ]; then
+  echo "${GEM_HOME}/bin" >>"$GITHUB_PATH"
+  echo "Ruby user gems path added to GITHUB_PATH"
+fi
+export PATH="${GEM_HOME}/bin:$PATH"
+echo "Ruby paths added to PATH environment variable"
 
 # Verify Ruby installation
 echo "Verifying Ruby installation..."
@@ -116,7 +123,7 @@ gem --version
 
 # Install bundler
 echo "Installing bundler..."
-gem install bundler
+gem install bundler --user-install
 bundler --version
 
 # Configure bundler to use vendor/bundle by default (avoid deprecated --path flag)
