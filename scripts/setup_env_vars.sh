@@ -21,7 +21,7 @@ PACKAGE_NAME=""
 BUNDLE_IDENTIFIER=""
 BUILD_ARGS_ANDROID=""
 BUILD_ARGS_IOS=""
-GIT_BRANCH=""
+MATCH_GIT_BRANCH=""
 
 # Parse named parameters
 while [[ $# -gt 0 ]]; do
@@ -102,8 +102,8 @@ while [[ $# -gt 0 ]]; do
         BUILD_ARGS_IOS="$2"
         shift 2
         ;;
-    --git-branch)
-        GIT_BRANCH="$2"
+    --match-git-branch)
+        MATCH_GIT_BRANCH="$2"
         shift 2
         ;;
     *)
@@ -134,7 +134,7 @@ echo "androidKeyStoreAlias=$ANDROID_KEY_STORE_ALIAS" >>"$GITHUB_ENV"
 echo "androidKeyPassword=$ANDROID_KEY_PASSWORD" >>"$GITHUB_ENV"
 echo "BUNDLE_IDENTIFIER=$BUNDLE_IDENTIFIER" >>"$GITHUB_ENV"
 echo "packageName=$PACKAGE_NAME" >>"$GITHUB_ENV"
-echo "GIT_BRANCH=$GIT_BRANCH" >>"$GITHUB_ENV"
+echo "MATCH_GIT_BRANCH=$MATCH_GIT_BRANCH" >>"$GITHUB_ENV"
 if [[ -n "$BUILD_NUMBER" ]]; then
     echo "buildNumber=$BUILD_NUMBER" >>"$GITHUB_ENV"
 fi

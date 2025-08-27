@@ -123,6 +123,7 @@ steps:
 | `buildNumber`                 | No                | -          | Build number to use                                |
 | `buildName`                   | No                | -          | Build name/version to use                          |
 | `iosDistributionJson`         | Yes (for iOS)     | -          | JSON containing iOS distribution secrets           |
+| `matchGitBranch`              | No                | `master`   | Git branch to use for fastlane match               |
 | `isPatch`                     | No                | `false`    | Whether to use shorebird patch build               |
 | `flutterVersion`              | No                | `3.27.4`   | Flutter version to use                             |
 | `flutterChannel`              | No                | `stable`   | Flutter channel to use                             |

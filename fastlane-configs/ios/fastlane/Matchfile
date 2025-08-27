@@ -16,4 +16,4 @@ readonly(false)
 
 shallow_clone(true)
 
-git_branch(ENV["GIT_BRANCH"])
+git_branch(ENV["MATCH_GIT_BRANCH"])
