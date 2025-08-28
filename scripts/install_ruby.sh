@@ -122,7 +122,7 @@ bundler --version
 
 # Configure bundler to use vendor/bundle by default (avoid deprecated --path flag)
 echo "Configuring bundler defaults..."
-bundle config set path "$(dirname "$RUNNER_WORKSPACE")/gems/vendor/bundle"
+bundle config set path "$(dirname "$RUNNER_WORKSPACE")/gems/${RUBY_VERSION}/vendor/bundle"
 # Use the dynamically defined Ruby path
 # No need to export PATH again as it was already set above on line 105
 echo "Script completed successfully"
