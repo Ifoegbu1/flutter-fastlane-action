@@ -27,9 +27,16 @@ A GitHub Action to build and deploy Flutter apps using Fastlane (for iOS) and Sh
 
 #### Fastlane and Match Setup
 
-> **IMPORTANT**: Fastlane must be set up in your iOS project before using this action.
+> **IMPORTANT**: You only need to set up Fastlane locally if:
+>
+> 1. It's your first time using Fastlane for this particular project
+> 2. You need to generate the MATCH_PASSWORD for your [iOS Distribution JSON](#ios-distribution-json-format)
+>
+> **NOTE**: This action uses fastlane match for code signing, which is fastlane's recommended approach for managing iOS certificates and provisioning profiles. Match stores your signing files in a secure Git repository and manages them consistently across your team.
+>
+> **NOTE**: You don't need to commit the ios/fastlane folder to your repository. This action will automatically handle the fastlane configuration for you.
 
-1. **Set up Fastlane in your iOS folder**:
+1. **Set up Fastlane in your iOS folder** (only needed once for initial setup):
 
    ```bash
    cd ios
@@ -68,7 +75,7 @@ To set up SSH deploy keys for your Match repository:
 
 3. Add the private key content to your `IOS_DISTRIBUTION_JSON` as the `MATCH_GIT_SSH_KEY`
 
-4. For more details, see [How to Use GitHub Deploy Keys](https://dylancastillo.co/posts/how-to-use-github-deploy-keys.html)
+4. For more details, see [How to Use GitHub Deploy Keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys)
 
 ### Android Requirements
 
@@ -114,34 +121,34 @@ steps:
 
 ## Input Parameters
 
-| Parameter                     | Required          | Default     | Description                                                                                                                                                                                              |
-| ----------------------------- | ----------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `workingDirectory`            | No                | `.`         | Directory where your Flutter project is located                                                                                                                                                          |
-| `platform`                    | Yes               | -           | Target platform (`ios` or `android`)                                                                                                                                                                     |
-| `androidBuildArgs`            | No                | -           | Additional build arguments for Android builds                                                                                                                                                            |
-| `iosBuildArgs`                | No                | -           | Additional build arguments for iOS builds                                                                                                                                                                |
-| `buildNumber`                 | No                | -           | Build number to use                                                                                                                                                                                      |
-| `buildName`                   | No                | -           | Build name/version to use                                                                                                                                                                                |
-| `iosDistributionJson`         | Yes (for iOS)     | -           | JSON containing iOS distribution secrets                                                                                                                                                                 |
-| `matchGitBranch`              | No                | `master`    | Git branch to use for fastlane match                                                                                                                                                                     |
-| `playStoreWhatsNewDirectory`  | No                | -           | The directory of localized "whats new" files to upload as the release notes. The files contained in the whatsNewDirectory MUST use the pattern whatsnew-<LOCALE> where LOCALE is using the BCP 47 format |
-| `playStoreInAppUpdatePriority`         | No                | `5`         | In-app update priority of the release [0-5], where 5 is the highest priority. All newly added APKs in the release will be considered at this priority                                                    |
-| `playStoreReleaseStatus`      | No                | `completed` | Release status. One of completed, inProgress, halted, draft. Cannot be null                                                                                                                              |
-| `playStoreUserFraction`       | No                | `1.0`       | Percentage of users who should get the staged version of the app (0.0-1.0)                                                                                                                               |
-| `isPatch`                     | No                | `false`     | Whether to use shorebird patch build                                                                                                                                                                     |
-| `flutterVersion`              | No                | `3.27.4`    | Flutter version to use                                                                                                                                                                                   |
-| `flutterChannel`              | No                | `stable`    | Flutter channel to use                                                                                                                                                                                   |
-| `shorebirdToken`              | No                | -           | Shorebird token (required if useShorebird is true)                                                                                                                                                       |
-| `useShorebird`                | No                | `false`     | Whether to use shorebird                                                                                                                                                                                 |
-| `javaVersion`                 | No                | `17`        | Java version to use                                                                                                                                                                                      |
-| `bundleIdentifier`            | Yes (for ios)     | -           | Bundle identifier for iOS                                                                                                                                                                                |
-| `packageName`                 | Yes (for Android) | -           | Package name for Android                                                                                                                                                                                 |
-| `track`                       | No                | `internal`  | Track to use for Google Play deployment                                                                                                                                                                  |
-| `serviceAccountJsonPlainText` | Yes (for Android) | -           | Service account JSON for Play Store deployment                                                                                                                                                           |
-| `androidKeyStorePath`         | Yes (for Android) | -           | Path to the Android key store                                                                                                                                                                            |
-| `androidKeyStorePassword`     | Yes (for Android) | -           | Password for the Android key store                                                                                                                                                                       |
-| `androidKeyStoreAlias`        | Yes (for Android) | -           | Alias for the Android key store                                                                                                                                                                          |
-| `androidKeyPassword`          | Yes (for Android) | -           | Password for the Android key                                                                                                                                                                             |
+| Parameter                      | Required          | Default     | Description                                                                                                                                                                                              |
+| ------------------------------ | ----------------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `workingDirectory`             | No                | `.`         | Directory where your Flutter project is located                                                                                                                                                          |
+| `platform`                     | Yes               | -           | Target platform (`ios` or `android`)                                                                                                                                                                     |
+| `androidBuildArgs`             | No                | -           | Additional build arguments for Android builds                                                                                                                                                            |
+| `iosBuildArgs`                 | No                | -           | Additional build arguments for iOS builds                                                                                                                                                                |
+| `buildNumber`                  | No                | -           | Build number to use                                                                                                                                                                                      |
+| `buildName`                    | No                | -           | Build name/version to use                                                                                                                                                                                |
+| `iosDistributionJson`          | Yes (for iOS)     | -           | JSON containing iOS distribution secrets                                                                                                                                                                 |
+| `matchGitBranch`               | No                | `master`    | Git branch to use for fastlane match                                                                                                                                                                     |
+| `playStoreWhatsNewDirectory`   | No                | -           | The directory of localized "whats new" files to upload as the release notes. The files contained in the whatsNewDirectory MUST use the pattern whatsnew-<LOCALE> where LOCALE is using the BCP 47 format |
+| `playStoreInAppUpdatePriority` | No                | `5`         | In-app update priority of the release [0-5], where 5 is the highest priority. All newly added APKs in the release will be considered at this priority                                                    |
+| `playStoreReleaseStatus`       | No                | `completed` | Release status. One of completed, inProgress, halted, draft. Cannot be null                                                                                                                              |
+| `playStoreUserFraction`        | No                | `1.0`       | Percentage of users who should get the staged version of the app (0.0-1.0)                                                                                                                               |
+| `isPatch`                      | No                | `false`     | Whether to use shorebird patch build                                                                                                                                                                     |
+| `flutterVersion`               | No                | `3.27.4`    | Flutter version to use                                                                                                                                                                                   |
+| `flutterChannel`               | No                | `stable`    | Flutter channel to use                                                                                                                                                                                   |
+| `shorebirdToken`               | No                | -           | Shorebird token (required if useShorebird is true)                                                                                                                                                       |
+| `useShorebird`                 | No                | `false`     | Whether to use shorebird                                                                                                                                                                                 |
+| `javaVersion`                  | No                | `17`        | Java version to use                                                                                                                                                                                      |
+| `bundleIdentifier`             | Yes (for ios)     | -           | Bundle identifier for iOS                                                                                                                                                                                |
+| `packageName`                  | Yes (for Android) | -           | Package name for Android                                                                                                                                                                                 |
+| `track`                        | No                | `internal`  | Track to use for Google Play deployment                                                                                                                                                                  |
+| `serviceAccountJsonPlainText`  | Yes (for Android) | -           | Service account JSON for Play Store deployment                                                                                                                                                           |
+| `androidKeyStorePath`          | Yes (for Android) | -           | Path to the Android key store                                                                                                                                                                            |
+| `androidKeyStorePassword`      | Yes (for Android) | -           | Password for the Android key store                                                                                                                                                                       |
+| `androidKeyStoreAlias`         | Yes (for Android) | -           | Alias for the Android key store                                                                                                                                                                          |
+| `androidKeyPassword`           | Yes (for Android) | -           | Password for the Android key                                                                                                                                                                             |
 
 ## iOS Distribution JSON Format
 
