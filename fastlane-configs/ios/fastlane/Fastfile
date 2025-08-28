@@ -18,6 +18,14 @@ default_platform(:ios)
 platform :ios do
   desc "Build and upload to TestFlight"
   lane :ios_testflight do
+    create_keychain(
+      name: "flutter_fastlane_keychain",
+      default_keychain: false,
+      unlock: true,
+      timeout: 3600,
+      lock_when_sleeps: false
+    )
+
     setup_ci
    
     
@@ -33,6 +41,7 @@ platform :ios do
     match(
       type: "appstore",  
       readonly: false,
+      keychain_name: "flutter_fastlane_keychain",
     )
     
     # Update Xcode project with Match profiles
