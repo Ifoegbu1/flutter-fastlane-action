@@ -22,7 +22,7 @@ platform :ios do
       name: "flutter_fastlane_keychain",
       default_keychain: false,
       unlock: true,
-      timeout: 3600,
+      timeout: 0,
       password: "flutter_fastlane_keychain_password",
       lock_when_sleeps: false
     )
