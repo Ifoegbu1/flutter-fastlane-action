@@ -10,6 +10,22 @@ inputs:
     description: "Directory where your Flutter project is located"
     required: false
     default: "."
+  playStoreWhatsNewDirectory:
+    description: "Notes for the staged version of the app to show to users."
+    required: false 
+    default: ""
+  playStoreInAppUpdatePriority:
+    description: "In-app update priority of the release"
+    required: false
+    default: "5"
+  playStoreReleaseStatus:
+    description: "Release status to use for android"
+    required: false
+    default: "completed"
+  playStoreUserFraction:
+    description: "Percentage of users who should get the staged version of the app."
+    required: false
+    default: "1.0"
   matchGitBranch:
     description: "Git branch to use for fastlane match"
     required: false
@@ -185,9 +201,10 @@ runs:
         packageName: ${{ inputs.packageName }}
         releaseFiles: ${{ env.workingDir }}/build/app/outputs/bundle/release/app-release.aab
         track: ${{ inputs.track }}
-        status: completed
-        inAppUpdatePriority: 5
-        whatsNewDirectory: ${{ env.workingDir }}/distribution/whatsnew
+        status: ${{ inputs.playStoreReleaseStatus }}
+        inAppUpdatePriority: ${{ inputs.playStoreInAppUpdatePriority }}
+        whatsNewDirectory: "${{ inputs.playStoreWhatsNewDirectory != '' ? inputs.playStoreWhatsNewDirectory : (env.workingDir + '/distribution/whatsnew') }}"
+        userFraction: ${{ inputs.playStoreUserFraction }}
         mappingFile: ${{ env.workingDir }}/build/app/outputs/mapping/release/mapping.txt
         debugSymbols: ${{ env.workingDir }}/build/app/intermediates/merged_native_libs/release/out/lib
 
