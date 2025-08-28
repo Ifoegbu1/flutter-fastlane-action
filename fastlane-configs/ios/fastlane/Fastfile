@@ -19,6 +19,9 @@ platform :ios do
   desc "Build and upload to TestFlight"
   lane :ios_testflight do
     setup_ci
+
+    delete_keychain(name: "fastlane_tmp_keychain-db")
+   
     
     # Configure App Store Connect API Key
     app_store_connect_api_key(
@@ -63,7 +66,7 @@ platform :ios do
         sh "echo \"🐦 Shorebird action initiated\""
         if isPatch == "true"
           sh "echo \"🎯 Shorebird Patch action initiated\""
-          patch_args = "--release-version #{releaseV} --allow-asset-diffs"
+          patch_args = "--release-version #{releaseV} --allow-asset-diffs --verbose"
           
           # Add additional build arguments if available
         
@@ -123,4 +126,9 @@ platform :ios do
   end
 
   
+end
+
+desc "delete created keychain"
+   lane :delete_chain do
+delete_keychain(name: "fastlane_tmp_keychain-db")
 end

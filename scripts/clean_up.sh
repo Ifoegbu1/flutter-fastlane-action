@@ -6,7 +6,16 @@ restore_ssh() {
         mv "$SSH_BACKUP_DIR" ~/.ssh
         echo "   -🔐 Restored entire .ssh directory from backup"
     fi
-
+   
 }
 
-trap restore_ssh EXIT
+delete_keychain() {
+    bundle exec fastlane delete_chain
+}
+
+cleanup() {
+    restore_ssh 
+    delete_keychain
+}
+
+trap cleanup EXIT

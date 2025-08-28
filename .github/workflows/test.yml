@@ -148,7 +148,7 @@ jobs:
       - name: Test SSH restore script
         run: |
           mkdir -p ~/.ssh
-          scripts/restore_ssh.sh || echo "SSH restore script executed"
+          scripts/clean_up.sh || echo "SSH restore script executed"
 
 # We can't do a full iOS test without proper certificates and profiles
 # but we can test the script execution

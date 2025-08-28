@@ -191,8 +191,9 @@ runs:
         mappingFile: ${{ env.workingDir }}/build/app/outputs/mapping/release/mapping.txt
         debugSymbols: ${{ env.workingDir }}/build/app/intermediates/merged_native_libs/release/out/lib
 
-    - name: Restore SSH
+    - name: Clean up
+      working-directory: ${{ env.workingDir }}/ios
       shell: bash
       if: ${{ env.platform == 'ios' && always()}}
       run: |
-        ${{ github.action_path }}/scripts/restore_ssh.sh
+        ${{ github.action_path }}/scripts/clean_up.sh
