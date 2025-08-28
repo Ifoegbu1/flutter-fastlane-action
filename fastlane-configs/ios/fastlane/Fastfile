@@ -19,8 +19,6 @@ platform :ios do
   desc "Build and upload to TestFlight"
   lane :ios_testflight do
     setup_ci
-
-    delete_keychain(name: "fastlane_tmp_keychain-db")
    
     
     # Configure App Store Connect API Key
