@@ -25,7 +25,7 @@ inputs:
   playStoreUserFraction:
     description: "Percentage of users who should get the staged version of the app."
     required: false
-    default: "1.0"
+    default: "0.99"
   matchGitBranch:
     description: "Git branch to use for fastlane match"
     required: false
