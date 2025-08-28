@@ -23,6 +23,7 @@ platform :ios do
       default_keychain: false,
       unlock: true,
       timeout: 3600,
+      password: "flutter_fastlane_keychain_password",
       lock_when_sleeps: false
     )
 
@@ -42,6 +43,7 @@ platform :ios do
       type: "appstore",  
       readonly: false,
       keychain_name: "flutter_fastlane_keychain",
+      keychain_password: "flutter_fastlane_keychain_password"
     )
     
     # Update Xcode project with Match profiles
