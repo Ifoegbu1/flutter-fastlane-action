@@ -29,8 +29,6 @@ platform :ios do
       password: "#{keychain_name}-password",
       lock_when_sleeps: false
     )
-
-    setup_ci
    
     
     # Configure App Store Connect API Key
