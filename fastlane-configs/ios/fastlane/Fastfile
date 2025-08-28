@@ -15,15 +15,18 @@
 
 default_platform(:ios)
 
+# Define keychain name as a variable to use throughout the file
+keychain_name = "ifoegbu1_flutter_fastlane_keychain"
+
 platform :ios do
   desc "Build and upload to TestFlight"
   lane :ios_testflight do
     create_keychain(
-      name: "flutter_fastlane_keychain",
+      name: keychain_name,
       default_keychain: false,
       unlock: true,
       timeout: 0,
-      password: "flutter_fastlane_keychain_password",
+      password: "#{keychain_name}-password",
       lock_when_sleeps: false
     )
 
@@ -42,8 +45,8 @@ platform :ios do
     match(
       type: "appstore",  
       readonly: false,
-      keychain_name: "flutter_fastlane_keychain",
-      keychain_password: "flutter_fastlane_keychain_password"
+      keychain_name: keychain_name,
+      keychain_password: "#{keychain_name}-password"
     )
     
     # Update Xcode project with Match profiles
@@ -139,5 +142,5 @@ end
 
 desc "delete created keychain"
    lane :delete_chain do
-delete_keychain(name: "fastlane_tmp_keychain-db")
+delete_keychain(name: "#{keychain_name}-db")
 end
