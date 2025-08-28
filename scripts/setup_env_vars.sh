@@ -22,6 +22,7 @@ BUNDLE_IDENTIFIER=""
 BUILD_ARGS_ANDROID=""
 BUILD_ARGS_IOS=""
 MATCH_GIT_BRANCH=""
+PLAY_STORE_WHATSNEW_DIRECTORY=""
 
 # Parse named parameters
 while [[ $# -gt 0 ]]; do
@@ -106,6 +107,10 @@ while [[ $# -gt 0 ]]; do
         MATCH_GIT_BRANCH="$2"
         shift 2
         ;;
+    --play-store-whatsnew-directory)
+        PLAY_STORE_WHATSNEW_DIRECTORY="$2"
+        shift 2
+        ;;
     *)
         echo "Unknown parameter: $1, please confirm your inputs"
         exit 1
@@ -150,6 +155,12 @@ fi
 if [[ -n "$BUILD_ARGS_IOS" ]]; then
     echo "buildArgsIos=$BUILD_ARGS_IOS" >>"$GITHUB_ENV"
 fi
+
+# Set default for Play Store what's new directory if not provided
+if [[ -z "$PLAY_STORE_WHATSNEW_DIRECTORY" ]]; then
+    PLAY_STORE_WHATSNEW_DIRECTORY="${WORKING_DIRECTORY}/distribution/whatsnew"
+fi
+echo "playStoreWhatsNewDirectory=$PLAY_STORE_WHATSNEW_DIRECTORY" >>"$GITHUB_ENV"
 # Check if API key content is base64 encoded (for iOS)
 if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_JSON" ]; then
     # Extract API key content

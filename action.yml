@@ -12,7 +12,7 @@ inputs:
     default: "."
   playStoreWhatsNewDirectory:
     description: "Notes for the staged version of the app to show to users."
-    required: false 
+    required: false
     default: ""
   playStoreInAppUpdatePriority:
     description: "In-app update priority of the release"
@@ -132,6 +132,7 @@ runs:
           --build-args-ios "${{ inputs.iosBuildArgs }}" \
           --bundle-identifier "${{ inputs.bundleIdentifier }}" \
           --match-git-branch "${{ inputs.matchGitBranch }}" \
+          --play-store-whatsnew-directory "${{ inputs.playStoreWhatsNewDirectory }}" \
           --service-account-json '${{ inputs.serviceAccountJsonPlainText }}' \
           --ios-secrets '${{ inputs.iosDistributionJson }}'
 
@@ -203,7 +204,7 @@ runs:
         track: ${{ inputs.track }}
         status: ${{ inputs.playStoreReleaseStatus }}
         inAppUpdatePriority: ${{ inputs.playStoreInAppUpdatePriority }}
-        whatsNewDirectory: "${{ inputs.playStoreWhatsNewDirectory != '' ? inputs.playStoreWhatsNewDirectory : (env.workingDir + '/distribution/whatsnew') }}"
+        whatsNewDirectory: ${{ env.playStoreWhatsNewDirectory }}
         userFraction: ${{ inputs.playStoreUserFraction }}
         mappingFile: ${{ env.workingDir }}/build/app/outputs/mapping/release/mapping.txt
         debugSymbols: ${{ env.workingDir }}/build/app/intermediates/merged_native_libs/release/out/lib
