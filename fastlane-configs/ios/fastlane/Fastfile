@@ -68,7 +68,7 @@ platform :ios do
           # Add additional build arguments if available
         
           
-          shorebird_patch(platform: "ios", args: patch_args)
+          shorebird_patch(platform: "ios", args: patch_args, verbose: true)
         else
           sh "echo \"🚀 Shorebird Release action initiated\""
           flutter_args = "--no-tree-shake-icons"
