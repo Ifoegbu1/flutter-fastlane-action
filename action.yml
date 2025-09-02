@@ -41,6 +41,10 @@ inputs:
     description: "Build arguments to use for ios"
     required: false
     default: ""
+  iosChangelog:
+    description: "Changelog to use for ios"
+    required: false
+    default: ""
   buildNumber:
     description: "Build number to use"
     required: false
@@ -132,6 +136,7 @@ runs:
           --build-args-ios "${{ inputs.iosBuildArgs }}" \
           --bundle-identifier "${{ inputs.bundleIdentifier }}" \
           --match-git-branch "${{ inputs.matchGitBranch }}" \
+          --ios-changelog "${{ inputs.iosChangelog }}" \
           --play-store-whatsnew-directory "${{ inputs.playStoreWhatsNewDirectory }}" \
           --service-account-json '${{ inputs.serviceAccountJsonPlainText }}' \
           --ios-secrets '${{ inputs.iosDistributionJson }}'

@@ -13,6 +13,7 @@ WORKING_DIRECTORY=""
 SHOREBIRD_TOKEN=""
 USE_SHOREBIRD=""
 ANDROID_KEY_STORE_PATH=""
+IOS_CHANGELOG=""
 ANDROID_KEY_STORE_PASSWORD=""
 ANDROID_KEY_STORE_ALIAS=""
 ANDROID_KEY_PASSWORD=""
@@ -49,6 +50,10 @@ while [[ $# -gt 0 ]]; do
         ;;
     --ios-secrets)
         IOS_JSON="$2"
+        shift 2
+        ;;
+    --ios-changelog)
+        IOS_CHANGELOG="$2"
         shift 2
         ;;
     --platform)
@@ -130,6 +135,7 @@ echo "flutterChannel=$FLUTTER_CHANNEL" >>"$GITHUB_ENV"
 # Keep it only in the current process environment for secure parsing below
 export IOS_JSON
 echo "platform=$PLATFORM" >>"$GITHUB_ENV"
+echo "iosChangelog=$IOS_CHANGELOG" >>"$GITHUB_ENV"
 echo "workingDir=$WORKING_DIRECTORY" >>"$GITHUB_ENV"
 echo "SHOREBIRD_TOKEN=$SHOREBIRD_TOKEN" >>"$GITHUB_ENV"
 echo "isShorebird=$USE_SHOREBIRD" >>"$GITHUB_ENV"
