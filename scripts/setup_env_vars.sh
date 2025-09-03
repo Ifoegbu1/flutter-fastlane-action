@@ -13,7 +13,7 @@ WORKING_DIRECTORY=""
 SHOREBIRD_TOKEN=""
 USE_SHOREBIRD=""
 ANDROID_KEY_STORE_PATH=""
-IOS_CHANGELOG=""
+# IOS_CHANGELOG=""
 ANDROID_KEY_STORE_PASSWORD=""
 ANDROID_KEY_STORE_ALIAS=""
 ANDROID_KEY_PASSWORD=""
@@ -135,23 +135,7 @@ echo "flutterChannel=$FLUTTER_CHANNEL" >>"$GITHUB_ENV"
 # Keep it only in the current process environment for secure parsing below
 export IOS_JSON
 echo "platform=$PLATFORM" >>"$GITHUB_ENV"
-
-# Handle multiline iosChangelog properly
-if [ -n "$IOS_CHANGELOG" ]; then
-    # Use multiline syntax if changelog contains newlines
-    if printf '%s' "$IOS_CHANGELOG" | grep -q $'\n'; then
-        delimiter="EOF_$(date +%s%N)_$RANDOM"
-        {
-            printf '%s<<%s\n' "iosChangelog" "$delimiter"
-            printf '%s\n' "$IOS_CHANGELOG"
-            printf '%s\n' "$delimiter"
-        } >>"$GITHUB_ENV"
-    else
-        echo "iosChangelog=$IOS_CHANGELOG" >>"$GITHUB_ENV"
-    fi
-else
-    echo "iosChangelog=" >>"$GITHUB_ENV"
-fi
+# echo "iosChangelog=$IOS_CHANGELOG" >>"$GITHUB_ENV"
 echo "workingDir=$WORKING_DIRECTORY" >>"$GITHUB_ENV"
 echo "SHOREBIRD_TOKEN=$SHOREBIRD_TOKEN" >>"$GITHUB_ENV"
 echo "isShorebird=$USE_SHOREBIRD" >>"$GITHUB_ENV"

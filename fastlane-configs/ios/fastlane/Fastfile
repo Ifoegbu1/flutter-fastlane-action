@@ -130,7 +130,7 @@ platform :ios do
     if isPatch == "false"
     upload_to_testflight(
       skip_waiting_for_build_processing: true,
-      changelog: ENV["iosChangelog"]
+      # changelog: ENV["iosChangelog"]
     )
     end
   end
