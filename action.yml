@@ -10,6 +10,14 @@ inputs:
     description: "Directory where your Flutter project is located"
     required: false
     default: "."
+  mappingFile:
+    description: "Mapping file to use for android"
+    required: false
+    default: "build/app/outputs/mapping/release/mapping.txt"
+  debugSymbols:
+    description: "Debug symbols to use for android"
+    required: false
+    default: "build/app/intermediates/merged_native_libs/release/out/lib"
   playStoreWhatsNewDirectory:
     description: "Notes for the staged version of the app to show to users."
     required: false
@@ -210,8 +218,8 @@ runs:
         inAppUpdatePriority: ${{ inputs.playStoreInAppUpdatePriority }}
         whatsNewDirectory: ${{ env.playStoreWhatsNewDirectory }}
         userFraction: ${{ inputs.playStoreUserFraction }}
-        mappingFile: ${{ env.workingDir }}/build/app/outputs/mapping/release/mapping.txt
-        debugSymbols: ${{ env.workingDir }}/build/app/intermediates/merged_native_libs/release/out/lib
+        mappingFile: ${{ env.workingDir }}/${{ inputs.mappingFile }}
+        debugSymbols: ${{ env.workingDir }}/${{ inputs.debugSymbols }}
 
     - name: Clean up
       working-directory: ${{ env.workingDir }}/ios
