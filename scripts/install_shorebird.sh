@@ -59,4 +59,6 @@ echo "$SHOREBIRD_BIN" >>"$GITHUB_PATH"
 # Verify path is set
 echo "✅ Shorebird bin directory ($SHOREBIRD_BIN) added to GITHUB_PATH"
 
+shorebird upgrade
+
 echo "✅ Shorebird setup complete!"
