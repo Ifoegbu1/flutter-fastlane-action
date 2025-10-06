@@ -25,6 +25,7 @@ if [ -d "$SHOREBIRD_BIN" ] && [ -f "$SHOREBIRD_BIN/shorebird" ]; then
       echo "👉 Adding existing Shorebird to GITHUB_PATH..."
       echo "$SHOREBIRD_BIN" >>"$GITHUB_PATH"
       echo "✅ Shorebird setup complete using existing installation!"
+      shorebird upgrade
       exit 0
     else
       echo "⚠️ Existing shorebird binary doesn't work correctly"
@@ -58,7 +59,5 @@ echo "$SHOREBIRD_BIN" >>"$GITHUB_PATH"
 
 # Verify path is set
 echo "✅ Shorebird bin directory ($SHOREBIRD_BIN) added to GITHUB_PATH"
-
-shorebird upgrade
 
 echo "✅ Shorebird setup complete!"
