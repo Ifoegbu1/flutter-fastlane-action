@@ -10,6 +10,31 @@ A GitHub Action to build and deploy Flutter apps using Fastlane (for iOS) and Sh
 - Optional Shorebird integration for patch releases
 - Configurable build parameters (version, build number)
 - Platform-specific build arguments for customizing builds
+- Optional dependency caching for faster builds (pub, gradle, cocoapods)
+
+## Caching
+
+This action supports caching dependencies to speed up subsequent builds. The caching feature is **disabled by default** but can be enabled by setting `withCache: "true"`.
+
+When enabled, the action will cache:
+
+- **Pub dependencies** (`~/.pub-cache` and `.dart_tool`) - for Flutter/Dart packages
+- **Gradle dependencies** (`~/.gradle/caches` and `~/.gradle/wrapper`) - for Android builds
+- **CocoaPods dependencies** (`ios/Pods` and CocoaPods caches) - for iOS builds
+
+Cache keys are automatically generated based on lock files (`pubspec.lock`, `Podfile.lock`, `*.gradle*`), ensuring that caches are invalidated when dependencies change.
+
+### Enabling Cache
+
+```yaml
+- uses: Ifoegbu1/flutter-fastlane-action@main
+  with:
+    platform: "ios" # or "android"
+    withCache: "true" # Enable caching
+    # ... other parameters
+```
+
+**Note:** Caching is recommended for projects with stable dependencies to reduce build times. However, if you experience any caching-related issues, you can disable it by setting `withCache: "false"` or omitting the parameter (default is `false`).
 
 ## Requirements
 
@@ -151,6 +176,7 @@ steps:
 | `androidKeyStorePassword`      | Yes (for Android) | -                                                            | Password for the Android key store                                                                                                                                                                       |
 | `androidKeyStoreAlias`         | Yes (for Android) | -                                                            | Alias for the Android key store                                                                                                                                                                          |
 | `androidKeyPassword`           | Yes (for Android) | -                                                            | Password for the Android key                                                                                                                                                                             |
+| `withCache`                    | No                | `false`                                                      | Whether to cache dependencies (pub, gradle, cocoapods). Set to `true` to enable caching and speed up builds                                                                                              |
 
 ## iOS Distribution JSON Format
 
@@ -379,6 +405,7 @@ jobs:
           bundleIdentifier: "com.example.myapp"
           iosBuildArgs: "--no-sound-null-safety --dart-define=ENVIRONMENT=production"
           iosDistributionJson: ${{ secrets.IOS_DISTRIBUTION_JSON }}
+          withCache: "true" # Enable caching for faster builds
 ```
 
 ### Android Build & Deploy
@@ -408,6 +435,7 @@ jobs:
           androidKeyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           androidKeyStoreAlias: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
           androidKeyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+          withCache: "true" # Enable caching for faster builds
 ```
 
 ### Shorebird Patch Build

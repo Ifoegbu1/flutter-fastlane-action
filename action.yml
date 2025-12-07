@@ -118,6 +118,10 @@ inputs:
     description: "Password to the android key"
     required: false
     default: ""
+  withCache:
+    description: "Whether to cache dependencies (pub, gradle, cocoapods)"
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -160,6 +164,17 @@ runs:
         distribution: "temurin"
         java-version: "${{ inputs.javaVersion }}"
 
+    - name: 📦 Cache Gradle Dependencies
+      if: ${{ env.platform == 'android' && inputs.withCache == 'true' }}
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+
     - name: 📦 Get Fastlane Configs and update ios folder
       working-directory: ${{ env.workingDir }}
       if: ${{ env.platform == 'ios' }}
@@ -172,6 +187,18 @@ runs:
       shell: bash
       run: |
         ${{ github.action_path }}/scripts/install_ruby.sh
+
+    - name: 📦 Cache CocoaPods Dependencies
+      if: ${{ env.platform == 'ios' && inputs.withCache == 'true' }}
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ env.workingDir }}/ios/Pods
+          ~/Library/Caches/CocoaPods
+          ~/.cocoapods
+        key: ${{ runner.os }}-pods-${{ hashFiles('**/Podfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pods-
 
     - name: 📦 Install Fastlane Dependencies
       if: ${{ env.platform == 'ios' }}
@@ -191,6 +218,17 @@ runs:
       if: ${{ env.isShorebird == 'true' }}
       run: |
         ${{ github.action_path }}/scripts/install_shorebird.sh
+
+    - name: 📦 Cache Pub Dependencies
+      if: ${{ inputs.withCache == 'true' }}
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.pub-cache
+          ${{ env.workingDir }}/.dart_tool
+        key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-pub-
 
     - name: 🏗️ Build and Deploy iOS App (Testflight)
       shell: bash
