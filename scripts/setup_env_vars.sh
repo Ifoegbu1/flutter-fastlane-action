@@ -17,6 +17,7 @@ ANDROID_KEY_STORE_PATH=""
 ANDROID_KEY_STORE_PASSWORD=""
 ANDROID_KEY_STORE_ALIAS=""
 ANDROID_KEY_PASSWORD=""
+SKIP_CONFIGURE_KEYSTORE=""
 SERVICE_ACCOUNT_JSON_PLAIN_TEXT=""
 PACKAGE_NAME=""
 BUNDLE_IDENTIFIER=""
@@ -88,6 +89,10 @@ while [[ $# -gt 0 ]]; do
         ANDROID_KEY_PASSWORD="$2"
         shift 2
         ;;
+    --skip-configure-keystore)
+        SKIP_CONFIGURE_KEYSTORE="$2"
+        shift 2
+        ;;
     --service-account-json)
         SERVICE_ACCOUNT_JSON_PLAIN_TEXT="$2"
         shift 2
@@ -143,6 +148,7 @@ echo "androidKeyStorePath=$ANDROID_KEY_STORE_PATH" >>"$GITHUB_ENV"
 echo "androidKeyStorePassword=$ANDROID_KEY_STORE_PASSWORD" >>"$GITHUB_ENV"
 echo "androidKeyStoreAlias=$ANDROID_KEY_STORE_ALIAS" >>"$GITHUB_ENV"
 echo "androidKeyPassword=$ANDROID_KEY_PASSWORD" >>"$GITHUB_ENV"
+echo "skipConfigureKeystore=$SKIP_CONFIGURE_KEYSTORE" >>"$GITHUB_ENV"
 echo "BUNDLE_IDENTIFIER=$BUNDLE_IDENTIFIER" >>"$GITHUB_ENV"
 echo "packageName=$PACKAGE_NAME" >>"$GITHUB_ENV"
 echo "MATCH_GIT_BRANCH=$MATCH_GIT_BRANCH" >>"$GITHUB_ENV"

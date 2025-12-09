@@ -88,7 +88,12 @@ configure_keystore() {
 }
 
 build() {
-    configure_keystore
+    # Only configure keystore if not skipped
+    if [ "$skipConfigureKeystore" != "true" ]; then
+        configure_keystore
+    else
+        echo "⏭️  Skipping keystore configuration (skipConfigureKeystore is set to true)"
+    fi
 
     if [ "$isShorebird" == "true" ]; then
         shorebird_build

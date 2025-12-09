@@ -176,6 +176,7 @@ steps:
 | `androidKeyStorePassword`      | Yes (for Android) | -                                                            | Password for the Android key store                                                                                                                                                                       |
 | `androidKeyStoreAlias`         | Yes (for Android) | -                                                            | Alias for the Android key store                                                                                                                                                                          |
 | `androidKeyPassword`           | Yes (for Android) | -                                                            | Password for the Android key                                                                                                                                                                             |
+| `skipConfigureKeystore`        | No                | `false`                                                      | Skip keystore configuration (useful if keystore is already configured in the project via `key.properties` file)                                                                                          |
 | `withCache`                    | No                | `false`                                                      | Whether to cache dependencies (pub, gradle, cocoapods). Set to `true` to enable caching and speed up builds                                                                                              |
 
 ## iOS Distribution JSON Format
@@ -225,7 +226,7 @@ The `iosDistributionJson` parameter should contain a JSON object with the follow
 
 For Android builds, you need to provide:
 
-1. Android keystore information:
+1. Android keystore information (unless `skipConfigureKeystore` is set to `true`):
 
    - `androidKeyStorePath`
    - `androidKeyStorePassword`
@@ -236,6 +237,8 @@ For Android builds, you need to provide:
    - `packageName`
    - `serviceAccountJsonPlainText`
    - `track` (optional, defaults to `internal`)
+
+> **Note:** If your keystore is already configured in your project, you can set `skipConfigureKeystore: "true"` to skip the automatic keystore configuration. See the [Skip Keystore Configuration](#skip-keystore-configuration) section for details.
 
 ### Setting up Google Play Service Account
 
@@ -338,6 +341,38 @@ When using this GitHub Action:
 - The action will automatically create this file during the build process
 - Values are populated from the action inputs (`androidKeyStorePath`, `androidKeyStorePassword`, etc.)
 - Ensure your keystore file is accessible to the action (can be stored in the repository or downloaded during the workflow)
+
+### Skip Keystore Configuration
+
+If your Android project already has the `key.properties` file configured (e.g., committed to the repository or created in a previous workflow step), you can skip the automatic keystore configuration by setting `skipConfigureKeystore: "true"`.
+
+**When to use `skipConfigureKeystore`:**
+
+- Your `key.properties` file is already committed to the repository
+- You manage keystore configuration through a custom script in your workflow
+- You're using a different signing configuration method
+
+**Example:**
+
+```yaml
+- name: Build and deploy Android app
+  uses: Ifoegbu1/flutter-fastlane-action@main
+  with:
+    platform: "android"
+    packageName: "com.example.app"
+    skipConfigureKeystore: "true" # Skip automatic keystore setup
+    serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+    # Note: androidKeyStore* parameters are not needed when skipConfigureKeystore is true
+```
+
+**Important:** When `skipConfigureKeystore` is set to `true`, the following parameters are not required:
+
+- `androidKeyStorePath`
+- `androidKeyStorePassword`
+- `androidKeyStoreAlias`
+- `androidKeyPassword`
+
+However, you must ensure that your `android/key.properties` file exists and is properly configured before the build step.
 
 ## Shorebird Integration
 

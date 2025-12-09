@@ -118,10 +118,14 @@ inputs:
     description: "Password to the android key"
     required: false
     default: ""
+  skipConfigureKeystore:
+    description: "Skip keystore configuration (useful if keystore is already configured in the project)"
+    required: false
+    default: "false"
   withCache:
     description: "Whether to cache dependencies (pub, gradle, cocoapods)"
     required: false
-    default: "false"
+    default: "false   "
 runs:
   using: "composite"
   steps:
@@ -143,6 +147,7 @@ runs:
           --android-key-store-password "${{ inputs.androidKeyStorePassword }}" \
           --android-key-store-alias "${{ inputs.androidKeyStoreAlias }}" \
           --android-key-password "${{ inputs.androidKeyPassword }}" \
+          --skip-configure-keystore "${{ inputs.skipConfigureKeystore }}" \
           --package-name "${{ inputs.packageName }}" \
           --build-args-android "${{ inputs.androidBuildArgs }}" \
           --build-args-ios "${{ inputs.iosBuildArgs }}" \

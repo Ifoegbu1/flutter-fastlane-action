@@ -191,8 +191,25 @@ validate_android_inputs() {
         exit 1
     fi
 
-    # Always validate keystore information
-    validate_android_keystore
+    # Validate keystore information only if not skipped
+    if [ "$skipConfigureKeystore" == "true" ]; then
+        echo "ℹ️  Skipping keystore validation (skipConfigureKeystore is set to true)"
+        echo "   Make sure your android/key.properties file is properly configured"
+
+        # Warn if keystore parameters are provided when they will be ignored
+        if [ -n "$androidKeyStorePath" ] || [ -n "$androidKeyStorePassword" ] || [ -n "$androidKeyStoreAlias" ] || [ -n "$androidKeyPassword" ]; then
+            echo ""
+            echo "⚠️  Warning: Keystore parameters are provided but will be ignored because skipConfigureKeystore is true"
+            echo "   The following parameters are not needed when skipConfigureKeystore is true:"
+            [ -n "$androidKeyStorePath" ] && echo "   - androidKeyStorePath"
+            [ -n "$androidKeyStorePassword" ] && echo "   - androidKeyStorePassword"
+            [ -n "$androidKeyStoreAlias" ] && echo "   - androidKeyStoreAlias"
+            [ -n "$androidKeyPassword" ] && echo "   - androidKeyPassword"
+            echo ""
+        fi
+    else
+        validate_android_keystore
+    fi
 
     # Always validate Google Play deployment requirements
     validate_google_play_requirements
