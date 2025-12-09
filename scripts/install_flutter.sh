@@ -5,16 +5,10 @@ cleanup() {
   # local exit_code=$?
   echo "⚠️ Script interrupted or workflow cancelled. Cleaning up..."
 
-  # Kill any curl processes started by this script
-  if [ -n "$CURL_PID" ] && ps -p "$CURL_PID" >/dev/null; then
-    echo "🛑 Terminating download process..."
-    kill -9 "$CURL_PID" 2>/dev/null || true
-  fi
-
-  # Clean up temporary directory if it exists
-  if [ -d "$TEMP_DIR" ]; then
-    echo "🧹 Removing temporary files..."
-    rm -rf "$TEMP_DIR"
+  # Kill any git processes started by this script
+  if [ -n "$GIT_PID" ] && ps -p "$GIT_PID" >/dev/null; then
+    echo "🛑 Terminating git process..."
+    kill -9 "$GIT_PID" 2>/dev/null || true
   fi
 
   echo "✅ Cleanup completed"
@@ -63,77 +57,47 @@ fi
 # Inform user about the installation directory
 echo "📂 Will install Flutter $FLUTTER_VERSION to: $INSTALL_DIR"
 
-# Create installation directory
-mkdir -p "$INSTALL_DIR"
-
-# Determine platform and download appropriate archive
-case "$PLATFORM" in
-Darwin)
-  FLUTTER_ARCHIVE="flutter_macos_${FLUTTER_VERSION}-${FLUTTER_CHANNEL}.zip"
-  DOWNLOAD_URL="https://storage.googleapis.com/flutter_infra_release/releases/${FLUTTER_CHANNEL}/macos/${FLUTTER_ARCHIVE}"
-  ;;
-Linux)
-  FLUTTER_ARCHIVE="flutter_linux_${FLUTTER_VERSION}-${FLUTTER_CHANNEL}.tar.xz"
-  DOWNLOAD_URL="https://storage.googleapis.com/flutter_infra_release/releases/${FLUTTER_CHANNEL}/linux/${FLUTTER_ARCHIVE}"
-  ;;
-MINGW* | MSYS* | CYGWIN*)
-  FLUTTER_ARCHIVE="flutter_windows_${FLUTTER_VERSION}-${FLUTTER_CHANNEL}.zip"
-  DOWNLOAD_URL="https://storage.googleapis.com/flutter_infra_release/releases/${FLUTTER_CHANNEL}/windows/${FLUTTER_ARCHIVE}"
-  ;;
-*)
-  echo "❌ Unsupported platform: $PLATFORM"
-  exit 1
-  ;;
-esac
-
-# Download Flutter SDK
-echo "📥 Downloading Flutter SDK from $DOWNLOAD_URL"
-TEMP_DIR=$(mktemp -d)
-ARCHIVE_PATH="$TEMP_DIR/$FLUTTER_ARCHIVE"
-
-# Start curl in background and save its PID
-curl -fSL "$DOWNLOAD_URL" -o "$ARCHIVE_PATH" &
-CURL_PID=$!
-
-# Wait for curl to complete and capture exit status
-wait $CURL_PID
-CURL_EXIT_STATUS=$?
-
-# Check if download was successful
-if [ $CURL_EXIT_STATUS -ne 0 ]; then
-  echo "❌ Failed to download Flutter SDK. Please check if version $FLUTTER_VERSION exists."
-  exit 1
-fi
-
-# Reset CURL_PID after successful download
-CURL_PID=""
-
 # Remove existing Flutter SDK if present
 if [ -d "$INSTALL_DIR" ]; then
   echo "🔄 Removing existing Flutter SDK installation"
   rm -rf "$INSTALL_DIR"
-  mkdir -p "$INSTALL_DIR"
 fi
 
-# Extract archive
-echo "📦 Extracting Flutter SDK"
-case "$PLATFORM" in
-Darwin | MINGW* | MSYS* | CYGWIN*)
-  # For macOS and Windows (zip format)
-  unzip -q "$ARCHIVE_PATH" -d "$TEMP_DIR"
-  mv "$TEMP_DIR/flutter/"* "$INSTALL_DIR"
-  ;;
-Linux)
-  # For Linux (tar.xz format)
-  tar -xf "$ARCHIVE_PATH" -C "$TEMP_DIR"
-  mv "$TEMP_DIR/flutter/"* "$INSTALL_DIR"
-  ;;
-esac
+# Create parent directory
+mkdir -p "$(dirname "$INSTALL_DIR")"
 
-# Clean up temporary files
-echo "🧹 Removing temporary files..."
-rm -rf "$TEMP_DIR"
-TEMP_DIR=""
+# Clone Flutter repository
+echo "📥 Cloning Flutter SDK from GitHub (this may take a few minutes)..."
+git clone https://github.com/flutter/flutter.git -b "$FLUTTER_CHANNEL" --depth 1 "$INSTALL_DIR"
+
+if [ $? -ne 0 ]; then
+  echo "❌ Failed to clone Flutter repository"
+  exit 1
+fi
+
+# Checkout specific version if provided and not a channel name
+if [[ "$FLUTTER_VERSION" != "stable" && "$FLUTTER_VERSION" != "beta" && "$FLUTTER_VERSION" != "dev" && "$FLUTTER_VERSION" != "master" ]]; then
+  echo "🔀 Checking out Flutter version $FLUTTER_VERSION..."
+  cd "$INSTALL_DIR"
+
+  # Unshallow the repository to allow fetching tags
+  git fetch --unshallow 2>/dev/null || true
+
+  # Fetch the specific tag
+  git fetch origin tag "$FLUTTER_VERSION" --depth 1
+  if [ $? -eq 0 ]; then
+    git checkout "$FLUTTER_VERSION" 2>/dev/null
+    if [ $? -eq 0 ]; then
+      echo "✅ Successfully checked out Flutter version $FLUTTER_VERSION"
+    else
+      echo "⚠️ Could not checkout tag $FLUTTER_VERSION, using latest from $FLUTTER_CHANNEL channel"
+    fi
+  else
+    echo "⚠️ Could not find tag $FLUTTER_VERSION, using latest from $FLUTTER_CHANNEL channel"
+  fi
+
+  cd - >/dev/null
+fi
 
 # Add Flutter to PATH
 echo "🔧 Setting up environment variables"
@@ -170,15 +134,19 @@ fi
 echo "$FLUTTER_VERSION" >"$INSTALL_DIR/version"
 echo "📝 Created version file at $INSTALL_DIR/version"
 
-# Verify installation
-if "$INSTALL_DIR/bin/flutter" --version | grep -q "$FLUTTER_VERSION"; then
-  echo "✅ Flutter SDK version $FLUTTER_VERSION has been successfully installed!"
+# Verify installation by running flutter --version
+echo "🔍 Verifying Flutter installation..."
+INSTALLED_VERSION=$("$INSTALL_DIR/bin/flutter" --version 2>&1)
+
+if [ $? -eq 0 ]; then
+  echo "✅ Flutter SDK has been successfully installed!"
+  echo "$INSTALLED_VERSION"
 else
-  echo "⚠️ Flutter was installed but version verification failed."
-  echo "Installed version:"
-  "$INSTALL_DIR/bin/flutter" --version
+  echo "⚠️ Flutter was installed but verification failed."
+  echo "$INSTALLED_VERSION"
 fi
 
 # Run Flutter doctor for verification
+echo ""
 echo "🩺 Running Flutter doctor for verification:"
 "$INSTALL_DIR/bin/flutter" doctor -v
