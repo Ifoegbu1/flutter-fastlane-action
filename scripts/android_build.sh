@@ -11,27 +11,29 @@ shorebird_build() {
 }
 shorebird_patch() {
     echo "🎯 SHOREBIRD PATCH OPERATION INITIATED."
-   shorebird patch --platforms=android --release-version="$releaseV" --allow-asset-diffs
+    shorebird patch --platforms=android --release-version="$releaseV" --allow-asset-diffs
 }
 
 shorebird_update() {
     echo "🎯 SHOREBIRD UPDATE OPERATION INITIATED."
-    flutter_args="--no-tree-shake-icons --obfuscate --split-debug-info=build/"
+    flutter_args=(--no-tree-shake-icons --obfuscate --split-debug-info=build/)
 
     # Add build-name and build-number if available
     if [ -n "$buildName" ]; then
-        flutter_args+=" --build-name=$buildName"
+        flutter_args+=(--build-name="$buildName")
     fi
     if [ -n "$buildNumber" ]; then
-        flutter_args+=" --build-number=$buildNumber"
+        flutter_args+=(--build-number="$buildNumber")
     fi
 
     # Add additional build arguments if available
     if [ -n "$buildArgsAndroid" ]; then
-        flutter_args+=" $buildArgsAndroid"
+        # Split buildArgsAndroid into array elements
+        read -ra extra_args <<<"$buildArgsAndroid"
+        flutter_args+=("${extra_args[@]}")
     fi
 
-    shorebird release android --flutter-version=$flutterV -- $flutter_args
+    shorebird release android --flutter-version="$flutterV" -- "${flutter_args[@]}"
     BUILD_EXIT_CODE=$?
 
     if [ $BUILD_EXIT_CODE -eq 0 ]; then
@@ -45,22 +47,24 @@ shorebird_update() {
 
 flutter_build() {
     echo "🐦 FLUTTER BUILD OPERATION INITIATED."
-    build_args="--obfuscate --split-debug-info=build/"
+    build_args=(--obfuscate --split-debug-info=build/)
 
     # Add build-name and build-number if available
     if [ -n "$buildName" ]; then
-        build_args+=" --build-name=$buildName"
+        build_args+=(--build-name="$buildName")
     fi
     if [ -n "$buildNumber" ]; then
-        build_args+=" --build-number=$buildNumber"
+        build_args+=(--build-number="$buildNumber")
     fi
 
     # Add additional build arguments if available
     if [ -n "$buildArgsAndroid" ]; then
-        build_args+=" $buildArgsAndroid"
+        # Split buildArgsAndroid into array elements
+        read -ra extra_args <<<"$buildArgsAndroid"
+        build_args+=("${extra_args[@]}")
     fi
 
-    flutter build appbundle "$build_args"
+    flutter build appbundle "${build_args[@]}"
     BUILD_EXIT_CODE=$?
 
     if [ $BUILD_EXIT_CODE -eq 0 ]; then
