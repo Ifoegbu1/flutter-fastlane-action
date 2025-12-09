@@ -151,9 +151,9 @@ steps:
 | `workingDirectory`             | No                | `.`                                                          | Directory where your Flutter project is located                                                                                                                                                          |
 | `platform`                     | Yes               | -                                                            | Target platform (`ios` or `android`)                                                                                                                                                                     |
 | `androidBuildArgs`             | No                | -                                                            | Additional build arguments for Android builds                                                                                                                                                            |
-| `androidReleaseOutput`         | No                | `build/app/outputs/bundle/release/app-release.aab`           | Path to the Android release output file (AAB or APK) relative to the working directory                                                                                                                   |
-| `mappingFile`                  | No                | `build/app/outputs/mapping/release/mapping.txt`              | Mapping file to use for Android                                                                                                                                                                          |
-| `debugSymbols`                 | No                | `build/app/intermediates/merged_native_libs/release/out/lib` | Debug symbols to use for Android                                                                                                                                                                         |
+| `androidReleaseOutput`         | No                | `build/app/outputs/bundle/release/app-release.aab`           | Path to the Android release output file (AAB or APK) relative to the working directory. Changes based on flavor (e.g., `productionRelease`)                                                              |
+| `mappingFile`                  | No                | `build/app/outputs/mapping/release/mapping.txt`              | Mapping file path for Android. Changes based on flavor (e.g., `build/app/outputs/mapping/productionRelease/mapping.txt`)                                                                                 |
+| `debugSymbols`                 | No                | `build/app/intermediates/merged_native_libs/release/out/lib` | Debug symbols path for Android. Changes based on flavor (e.g., `build/app/intermediates/merged_native_libs/productionRelease/out/lib`)                                                                   |
 | `iosBuildArgs`                 | No                | -                                                            | Additional build arguments for iOS builds                                                                                                                                                                |
 | `buildNumber`                  | No                | -                                                            | Build number to use                                                                                                                                                                                      |
 | `buildName`                    | No                | -                                                            | Build name/version to use                                                                                                                                                                                |
@@ -476,7 +476,7 @@ jobs:
 
 ### Android Build with Custom Flavors
 
-If you're using flavors or custom build configurations, you can specify a custom output path:
+If you're using flavors or custom build configurations, you need to specify custom paths for the output files. The paths change based on the flavor name:
 
 ```yaml
 - name: Build and deploy Android app with flavor
@@ -484,7 +484,10 @@ If you're using flavors or custom build configurations, you can specify a custom
   with:
     platform: "android"
     androidBuildArgs: "--flavor production -t lib/main_production.dart"
+    # Customize paths based on flavor name (productionRelease in this case)
     androidReleaseOutput: "build/app/outputs/bundle/productionRelease/app-production-release.aab"
+    mappingFile: "build/app/outputs/mapping/productionRelease/mapping.txt"
+    debugSymbols: "build/app/intermediates/merged_native_libs/productionRelease/out/lib"
     packageName: "com.example.app"
     serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
     androidKeyStorePath: ${{ secrets.ANDROID_KEYSTORE_PATH }}
@@ -492,6 +495,14 @@ If you're using flavors or custom build configurations, you can specify a custom
     androidKeyStoreAlias: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
     androidKeyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
 ```
+
+**Note:** When using flavors, the build output paths follow this pattern:
+
+- **AAB**: `build/app/outputs/bundle/{flavorName}Release/app-{flavor}-release.aab`
+- **Mapping file**: `build/app/outputs/mapping/{flavorName}Release/mapping.txt`
+- **Debug symbols**: `build/app/intermediates/merged_native_libs/{flavorName}Release/out/lib`
+
+Replace `{flavorName}` with your actual flavor name (e.g., `production`, `staging`, `development`).
 
 ### Shorebird Patch Build
 

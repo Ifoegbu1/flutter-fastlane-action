@@ -15,11 +15,11 @@ inputs:
     required: false
     default: "build/app/outputs/bundle/release/app-release.aab"
   mappingFile:
-    description: "Mapping file to use for android"
+    description: "Mapping file path for Android (changes based on flavor, e.g., productionRelease)"
     required: false
     default: "build/app/outputs/mapping/release/mapping.txt"
   debugSymbols:
-    description: "Debug symbols to use for android"
+    description: "Debug symbols path for Android (changes based on flavor, e.g., productionRelease)"
     required: false
     default: "build/app/intermediates/merged_native_libs/release/out/lib"
   playStoreWhatsNewDirectory:
