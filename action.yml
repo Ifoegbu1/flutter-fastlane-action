@@ -65,7 +65,7 @@ inputs:
     required: false
   iosDistributionJson:
     description: "IOS secrets json to use. See README.md for more details"
-    required: true
+    required: false
   isPatch:
     description: "Whether to use shorebird patch build(Note: This is only applicable to shorebird projects)"
     required: false
