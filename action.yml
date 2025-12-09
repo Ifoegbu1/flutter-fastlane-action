@@ -10,6 +10,10 @@ inputs:
     description: "Directory where your Flutter project is located"
     required: false
     default: "."
+  androidReleaseOutput:
+    description: "Path to the Android release output file (AAB)"
+    required: false
+    default: "build/app/outputs/bundle/release/app-release.aab"
   mappingFile:
     description: "Mapping file to use for android"
     required: false
@@ -255,7 +259,7 @@ runs:
       with:
         serviceAccountJsonPlainText: ${{ inputs.serviceAccountJsonPlainText }}
         packageName: ${{ inputs.packageName }}
-        releaseFiles: ${{ env.workingDir }}/build/app/outputs/bundle/release/app-release.aab
+        releaseFiles: ${{ env.workingDir }}/${{ inputs.androidReleaseOutput }}
         track: ${{ inputs.track }}
         status: ${{ inputs.playStoreReleaseStatus }}
         inAppUpdatePriority: ${{ inputs.playStoreInAppUpdatePriority }}

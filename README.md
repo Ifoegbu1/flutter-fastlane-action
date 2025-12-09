@@ -151,6 +151,7 @@ steps:
 | `workingDirectory`             | No                | `.`                                                          | Directory where your Flutter project is located                                                                                                                                                          |
 | `platform`                     | Yes               | -                                                            | Target platform (`ios` or `android`)                                                                                                                                                                     |
 | `androidBuildArgs`             | No                | -                                                            | Additional build arguments for Android builds                                                                                                                                                            |
+| `androidReleaseOutput`         | No                | `build/app/outputs/bundle/release/app-release.aab`           | Path to the Android release output file (AAB or APK) relative to the working directory                                                                                                                   |
 | `mappingFile`                  | No                | `build/app/outputs/mapping/release/mapping.txt`              | Mapping file to use for Android                                                                                                                                                                          |
 | `debugSymbols`                 | No                | `build/app/intermediates/merged_native_libs/release/out/lib` | Debug symbols to use for Android                                                                                                                                                                         |
 | `iosBuildArgs`                 | No                | -                                                            | Additional build arguments for iOS builds                                                                                                                                                                |
@@ -471,6 +472,25 @@ jobs:
           androidKeyStoreAlias: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
           androidKeyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
           withCache: "true" # Enable caching for faster builds
+```
+
+### Android Build with Custom Flavors
+
+If you're using flavors or custom build configurations, you can specify a custom output path:
+
+```yaml
+- name: Build and deploy Android app with flavor
+  uses: Ifoegbu1/flutter-fastlane-action@main
+  with:
+    platform: "android"
+    androidBuildArgs: "--flavor production -t lib/main_production.dart"
+    androidReleaseOutput: "build/app/outputs/bundle/productionRelease/app-production-release.aab"
+    packageName: "com.example.app"
+    serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+    androidKeyStorePath: ${{ secrets.ANDROID_KEYSTORE_PATH }}
+    androidKeyStorePassword: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+    androidKeyStoreAlias: ${{ secrets.ANDROID_KEYSTORE_ALIAS }}
+    androidKeyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
 ```
 
 ### Shorebird Patch Build
