@@ -115,9 +115,75 @@ EOF
 
 }
 
+create_branch_for_match() {
+    echo "🌿 Checking/creating branch for Match repository..."
+
+    # Check if required environment variables are set
+    if [[ -z "${MATCH_SIGNING_GIT_URL:-}" ]]; then
+        echo "❌ Error: MATCH_SIGNING_GIT_URL environment variable is not set"
+        exit 1
+    fi
+
+    if [[ -z "${MATCH_GIT_BRANCH:-}" ]]; then
+        echo "❌ Error: MATCH_GIT_BRANCH environment variable is not set"
+        exit 1
+    fi
+
+    echo "   - Repository: $MATCH_SIGNING_GIT_URL"
+    echo "   - Branch: $MATCH_GIT_BRANCH"
+
+    # Create a temporary directory for cloning
+    TEMP_MATCH_DIR=$(mktemp -d)
+    trap 'rm -rf "$TEMP_MATCH_DIR"' EXIT
+
+    # Clone the repository
+    echo "   - Cloning repository to temporary location..."
+    if ! git clone --quiet "$MATCH_SIGNING_GIT_URL" "$TEMP_MATCH_DIR" 2>/dev/null; then
+        echo "❌ Error: Failed to clone repository"
+        exit 1
+    fi
+
+    cd "$TEMP_MATCH_DIR"
+
+    # Check if branch exists on remote
+    if git ls-remote --heads origin "$MATCH_GIT_BRANCH" | grep -q "$MATCH_GIT_BRANCH"; then
+        echo "✅ Branch '$MATCH_GIT_BRANCH' already exists on remote"
+    else
+        echo "   - Branch '$MATCH_GIT_BRANCH' does not exist, creating it..."
+
+        # Create an orphan branch (no history from master/main)
+        git checkout --orphan "$MATCH_GIT_BRANCH"
+
+        # Remove all files from staging (orphan branch starts with staged files)
+        git rm -rf . 2>/dev/null || true
+
+        # Create an initial .gitignore file
+        cat >.gitignore <<EOF
+# Fastlane Match Repository
+# This repository stores encrypted certificates and profiles
+EOF
+
+        git add .gitignore
+        git commit -m "Initialize $MATCH_GIT_BRANCH branch for fastlane match"
+
+        # Push the new branch
+        if git push origin "$MATCH_GIT_BRANCH"; then
+            echo "✅ Successfully created and pushed branch '$MATCH_GIT_BRANCH'"
+        else
+            echo "❌ Error: Failed to push branch '$MATCH_GIT_BRANCH'"
+            exit 1
+        fi
+    fi
+
+    # Return to original directory
+    cd - >/dev/null
+
+    echo "✅ Match branch setup complete"
+}
+
 main() {
     echo "🔧 Getting Fastlane configs..."
-    backup_ssh && get_fastlane_configs && match_ssh
+    backup_ssh && get_fastlane_configs && match_ssh && create_branch_for_match
 
 }
 
