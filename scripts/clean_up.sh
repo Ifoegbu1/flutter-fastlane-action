@@ -4,7 +4,7 @@ restore_ssh() {
     if [[ -d "$SSH_BACKUP_DIR" ]]; then
         rm -rf ~/.ssh
         mv "$SSH_BACKUP_DIR" ~/.ssh
-        echo "   -🔐 Restored entire .ssh directory from backup"
+        echo -e "\033[1;36m   -🔐 Restored entire .ssh directory from backup\033[0m"
     fi
    
 }

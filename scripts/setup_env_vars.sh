@@ -122,7 +122,7 @@ while [[ $# -gt 0 ]]; do
         shift 2
         ;;
     *)
-        echo "Unknown parameter: $1, please confirm your inputs"
+        echo -e "\033[1;31mUnknown parameter: $1, please confirm your inputs\033[0m"
         exit 1
         ;;
     esac
@@ -131,7 +131,7 @@ done
 yaml_file="pubspec.yaml"
 
 # Set environment variables
-echo "Setting up environment variables..."
+echo -e "\033[1;36mSetting up environment variables...\033[0m"
 echo "isPatch=$IS_PATCH" >>"$GITHUB_ENV"
 echo "flutterV=$FLUTTER_VERSION" >>"$GITHUB_ENV"
 echo "flutterChannel=$FLUTTER_CHANNEL" >>"$GITHUB_ENV"
@@ -206,15 +206,15 @@ if [[ "$PLATFORM" == "ios" ]]; then
         # Don't add service account JSON directly to environment - will be used directly in the action
         echo "hasIosSecrets=true" >>"$GITHUB_ENV"
     fi
-    echo "Setting up iOS environment variables..."
+    echo -e "\033[1;36mSetting up iOS environment variables...\033[0m"
     bash "$GITHUB_ACTION_PATH/scripts/ios_setup_env_vars_secure.sh"
 
 fi
 
-echo "✅ Environment variables set successfully."
+echo -e "\033[1;32m✅ Environment variables set successfully.\033[0m"
 echo ""
-echo "📋 Summary:"
-echo "  - flutterVersion: $FLUTTER_VERSION"
-echo "  - platform: $PLATFORM"
-echo "  - isPatch: $IS_PATCH"
-echo "  - useShorebird: $USE_SHOREBIRD"
+echo -e "\033[1;34m📋 Summary:\033[0m"
+echo -e "\033[1;34m  - flutterVersion: $FLUTTER_VERSION\033[0m"
+echo -e "\033[1;34m  - platform: $PLATFORM\033[0m"
+echo -e "\033[1;34m  - isPatch: $IS_PATCH\033[0m"
+echo -e "\033[1;34m  - useShorebird: $USE_SHOREBIRD\033[0m"

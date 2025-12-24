@@ -3,7 +3,7 @@ set -e
 STATUS=0
 
 if [[ -z "$IOS_SECRETS" ]]; then
-    echo "❌ Error: IOS_SECRETS environment variable is not set"
+    echo -e "\033[1;31m❌ Error: IOS_SECRETS environment variable is not set\033[0m"
     exit 1
 fi
 
@@ -30,7 +30,7 @@ while IFS='=' read -r key value; do
         else
 
             export "$key"="$value"
-            echo "Exported: $key=[MASKED]"
+            echo -e "\033[1;34mExported: $key=[MASKED]\033[0m"
         fi
     fi
 done <"$TEMP_FILE"
@@ -39,8 +39,8 @@ rm -f "$TEMP_FILE" || STATUS=$?
 
 # Only display success message if all commands were successful
 if [ $STATUS -eq 0 ]; then
-    echo "✅ Environment variables set up securely from JSON secrets"
+    echo -e "\033[1;32m✅ Environment variables set up securely from JSON secrets\033[0m"
 else
-    echo "❌ Error: Failed to set up environment variables securely"
+    echo -e "\033[1;31m❌ Error: Failed to set up environment variables securely\033[0m"
     exit $STATUS
 fi

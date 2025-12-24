@@ -10,12 +10,12 @@ shorebird_build() {
     fi
 }
 shorebird_patch() {
-    echo "🎯 SHOREBIRD PATCH OPERATION INITIATED."
+    echo -e "\033[1;36m🎯 SHOREBIRD PATCH OPERATION INITIATED.\033[0m"
     shorebird patch --platforms=android --release-version="$releaseV" --allow-asset-diffs
 }
 
 shorebird_update() {
-    echo "🎯 SHOREBIRD UPDATE OPERATION INITIATED."
+    echo -e "\033[1;36m🎯 SHOREBIRD UPDATE OPERATION INITIATED.\033[0m"
     flutter_args=(--no-tree-shake-icons --obfuscate --split-debug-info=build/)
 
     # Add build-name and build-number if available
@@ -37,16 +37,16 @@ shorebird_update() {
     BUILD_EXIT_CODE=$?
 
     if [ $BUILD_EXIT_CODE -eq 0 ]; then
-        echo "✅ Shorebird release completed successfully."
+        echo -e "\033[1;32m✅ Shorebird release completed successfully.\033[0m"
 
     else
-        echo "❌ Shorebird release failed with exit code $BUILD_EXIT_CODE. Skipping signing."
+        echo -e "\033[1;31m❌ Shorebird release failed with exit code $BUILD_EXIT_CODE. Skipping signing.\033[0m"
         exit $BUILD_EXIT_CODE
     fi
 }
 
 flutter_build() {
-    echo "🐦 FLUTTER BUILD OPERATION INITIATED."
+    echo -e "\033[1;36m🐦 FLUTTER BUILD OPERATION INITIATED.\033[0m"
     build_args=(--obfuscate --split-debug-info=build/)
 
     # Add build-name and build-number if available
@@ -68,12 +68,12 @@ flutter_build() {
     BUILD_EXIT_CODE=$?
 
     if [ $BUILD_EXIT_CODE -eq 0 ]; then
-        echo "✅ Flutter build completed successfully."
+        echo -e "\033[1;32m✅ Flutter build completed successfully.\033[0m"
 
         # Sign the AAB file if keystore is provided
 
     else
-        echo "❌ Flutter build failed with exit code $BUILD_EXIT_CODE. Skipping signing."
+        echo -e "\033[1;31m❌ Flutter build failed with exit code $BUILD_EXIT_CODE. Skipping signing.\033[0m"
         exit $BUILD_EXIT_CODE
     fi
 }
@@ -92,7 +92,7 @@ build() {
     if [ "$skipConfigureKeystore" != "true" ]; then
         configure_keystore
     else
-        echo "⏭️  Skipping keystore configuration (skipConfigureKeystore is set to true)"
+        echo -e "\033[1;33m⏭️  Skipping keystore configuration (skipConfigureKeystore is set to true)\033[0m"
     fi
 
     if [ "$isShorebird" == "true" ]; then
