@@ -90,7 +90,7 @@ Cache keys are automatically generated based on lock files (`pubspec.lock`, `Pod
 
 To set up SSH deploy keys for your Match repository:
 
-1. Generate an SSH key pair:
+1. Generate an SSH key pair (**do not set a passphrase**):
 
    ```bash
    ssh-keygen -t ed25519 -C "your_email@example.com" -f ./match_deploy_key
@@ -203,10 +203,10 @@ The `iosDistributionJson` parameter should contain a JSON object with the follow
   "APPLE_ID": "example@example.com",
   "APP_STORE_CONNECT_API_ISSUER_ID": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
   "APP_STORE_CONNECT_API_KEY_ID": "ABCDE12345",
-  "APP_STORE_CONNECT_API_KEY_CONTENT": "BASE64_ENCODED_KEY_CONTENT",
+  "APP_STORE_CONNECT_API_KEY_CONTENT": "The .p8 private key content (Base64 or raw). For raw replace new lines with \n eg: -----BEGIN PRIVATE KEY-----\nMIGTAgEAMBMGB...",
   "MATCH_SIGNING_GIT_URL": "git@github.com:username/ios-signing.git",
   "MATCH_PASSWORD": "your-match-password",
-  "MATCH_GIT_SSH_KEY": "YOUR_SSH_PRIVATE_KEY"
+  "MATCH_GIT_SSH_KEY": "Raw format: -----BEGIN OPENSSH PRIVATE KEY-----\nb3BlbnN..."
 }
 ```
 
@@ -228,7 +228,6 @@ The `iosDistributionJson` parameter should contain a JSON object with the follow
 For Android builds, you need to provide:
 
 1. Android keystore information (unless `skipConfigureKeystore` is set to `true`):
-
    - `androidKeyStorePath`
    - `androidKeyStorePassword`
    - `androidKeyStoreAlias`
@@ -246,24 +245,20 @@ For Android builds, you need to provide:
 To deploy to Google Play Store, you need a service account JSON key:
 
 1. **Enable the Google Play Android Developer API**
-
    - Go to https://console.cloud.google.com/apis/library/androidpublisher.googleapis.com
    - Click on **Enable**
 
 2. **Create a service account in Google Cloud Platform**
-
    - Navigate to https://cloud.google.com/gcp
    - Open **IAM & Admin > Service accounts > Create service account**
    - Pick a name for the new account (no need to grant permissions)
 
 3. **Get the service account JSON key**
-
    - Open the newly created service account
    - Click on **Keys** tab and add a new key (JSON type)
    - A JSON file will be automatically downloaded to your machine
 
 4. **Store in GitHub Secrets**
-
    - Copy the entire contents of the downloaded JSON file
    - Create a new repository secret (e.g., `SERVICE_ACCOUNT_JSON`)
    - Paste the JSON content into the secret value
@@ -547,13 +542,11 @@ jobs:
 #### Android Build Issues
 
 1. **App signing problems:**
-
    - Ensure your `build.gradle` is properly configured as shown in the Android setup section
    - Verify that your keystore file is valid and accessible to the action
    - Check that the key alias and passwords are correct in your GitHub secrets
 
 2. **Google Play deployment fails:**
-
    - Ensure your service account has proper permissions in the Google Play Console
    - Verify that your package name matches exactly with what's in the Play Store
    - Check that your app is properly registered in the desired track
@@ -565,13 +558,11 @@ jobs:
 #### iOS Build Issues
 
 1. **Match certificate errors:**
-
    - Ensure your Match Git repository is accessible via the provided SSH key
    - Verify that the Match password is correct
    - Try running Match locally to validate certificates before using in the action
 
 2. **TestFlight upload fails:**
-
    - Verify your App Store Connect API key has sufficient permissions
    - Ensure your bundle identifier matches what's registered in App Store Connect
    - Check that your app version and build number are not already in use
