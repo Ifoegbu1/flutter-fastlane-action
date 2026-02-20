@@ -173,20 +173,16 @@ if [[ -z "$PLAY_STORE_WHATSNEW_DIRECTORY" ]]; then
     PLAY_STORE_WHATSNEW_DIRECTORY="${WORKING_DIRECTORY}/distribution/whatsnew"
 fi
 echo "playStoreWhatsNewDirectory=$PLAY_STORE_WHATSNEW_DIRECTORY" >>"$GITHUB_ENV"
-# Check if API key content is base64 encoded (for iOS)
+# Encode API key content to base64 if raw (for iOS)
 if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_JSON" ]; then
-    # Extract API key content
     API_KEY_CONTENT=$(echo "$IOS_JSON" | jq -r '.APP_STORE_CONNECT_API_KEY_CONTENT // ""')
 
-    # Check if the content is base64 encoded
     if [ -n "$API_KEY_CONTENT" ]; then
-        # Try to decode and see if it's valid base64
-        if echo "$API_KEY_CONTENT" | base64 -d >/dev/null 2>&1; then
-            echo "isKeyBase64=true" >>"$GITHUB_ENV"
-            # echo "APP_STORE_CONNECT_API_KEY_CONTENT is base64 encoded"
-        else
-            echo "isKeyBase64=false" >>"$GITHUB_ENV"
-            # echo "APP_STORE_CONNECT_API_KEY_CONTENT is not base64 encoded"
+        # If not valid base64, encode it
+        if ! echo "$API_KEY_CONTENT" | base64 -d >/dev/null 2>&1; then
+            API_KEY_CONTENT=$(printf '%s' "$API_KEY_CONTENT" | base64 | tr -d '\n')
+            IOS_JSON=$(echo "$IOS_JSON" | jq --arg content "$API_KEY_CONTENT" '.APP_STORE_CONNECT_API_KEY_CONTENT = $content')
+            export IOS_JSON
         fi
     fi
 fi
@@ -203,8 +199,8 @@ echo "releaseV=$releaseV" >>"$GITHUB_ENV"
 # Execute platform-specific setup scripts
 if [[ "$PLATFORM" == "ios" ]]; then
     if [ -n "$IOS_JSON" ]; then
-        # Don't add service account JSON directly to environment - will be used directly in the action
         echo "hasIosSecrets=true" >>"$GITHUB_ENV"
+        export IOS_SECRETS="$IOS_JSON"
     fi
     echo -e "\033[1;36mSetting up iOS environment variables...\033[0m"
     bash "$GITHUB_ACTION_PATH/scripts/ios_setup_env_vars_secure.sh"
