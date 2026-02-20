@@ -174,12 +174,15 @@ if [[ -z "$PLAY_STORE_WHATSNEW_DIRECTORY" ]]; then
 fi
 echo "playStoreWhatsNewDirectory=$PLAY_STORE_WHATSNEW_DIRECTORY" >>"$GITHUB_ENV"
 # Encode API key content to base64 if raw (for iOS)
+# Raw PEM keys need actual newlines—convert literal \n before encoding to avoid "invalid curve name"
 if [ "$PLATFORM" == "ios" ] && [ -n "$IOS_JSON" ]; then
     API_KEY_CONTENT=$(echo "$IOS_JSON" | jq -r '.APP_STORE_CONNECT_API_KEY_CONTENT // ""')
 
     if [ -n "$API_KEY_CONTENT" ]; then
-        # If not valid base64, encode it
-        if ! echo "$API_KEY_CONTENT" | base64 -d >/dev/null 2>&1; then
+        # Detect raw PEM (starts with -----BEGIN) vs already base64
+        if [[ "$API_KEY_CONTENT" == -----BEGIN* ]]; then
+            # Convert literal \n to actual newlines (common when stored in JSON/secrets)
+            API_KEY_CONTENT="${API_KEY_CONTENT//\\n/$'\n'}"
             API_KEY_CONTENT=$(printf '%s' "$API_KEY_CONTENT" | base64 | tr -d '\n')
             IOS_JSON=$(echo "$IOS_JSON" | jq --arg content "$API_KEY_CONTENT" '.APP_STORE_CONNECT_API_KEY_CONTENT = $content')
             export IOS_JSON
