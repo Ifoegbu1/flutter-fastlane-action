@@ -118,24 +118,35 @@ platform :ios do
           )
         end
       else
-        sh "echo \"🚀 Building with Flutter version: #{flutterV}\""
-        build_cmd = "cd ../.. && flutter build ipa --release"
+            flutter_build(
+        debug: true,
+
+        build_number: ENV["buildNumber"],
+        build_name: ENV["buildName"],
+
+        build_args: (ENV["buildArgsIos"] || "").split,
+      )
+        # sh "echo \"🚀 Building with Flutter version: #{flutterV}\""
+        # build_cmd = "cd ../.. && flutter build ipa --release"
         
-        # Add build-name and build-number if available
-        if ENV["buildName"]
-          build_cmd += " --build-name=#{ENV["buildName"]}"
-        end
-        if ENV["buildNumber"]
-          build_cmd += " --build-number=#{ENV["buildNumber"]}"
-        end
+        # # Add build-name and build-number if available
+        # if ENV["buildName"]
+        #   build_cmd += " --build-name=#{ENV["buildName"]}"
+        # end
+        # if ENV["buildNumber"]
+        #   build_cmd += " --build-number=#{ENV["buildNumber"]}"
+        # end
         
-        # Add additional build arguments if available
-        if ENV["buildArgsIos"]
-          build_cmd += " #{ENV["buildArgsIos"]}"
-        end
+        # # Add additional build arguments if available
+        # if ENV["buildArgsIos"]
+        #   build_cmd += " #{ENV["buildArgsIos"]}"
+        # end
         
-        sh build_cmd
+        # sh build_cmd
       end
+    
+      gym(silent: true, suppress_xcode_output: true)
+
 
 
     # Upload to TestFlight
