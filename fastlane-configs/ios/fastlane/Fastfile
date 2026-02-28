@@ -62,9 +62,8 @@ platform :ios do
         bundle_identifier: ENV["BUNDLE_IDENTIFIER"],
         profile_name:ENV["sigh_#{ENV['BUNDLE_IDENTIFIER']}_appstore_profile-name"],
         code_sign_identity: "iPhone Distribution",
-        entitlements_file_path: "Runner/Runner.entitlements"
-        profile_uuid:ENV["sigh_#{ENV['BUNDLE_IDENTIFIER']}_appstore"]
-        
+        entitlements_file_path: "Runner/Runner.entitlements",
+        profile_uuid: ENV["sigh_#{ENV['BUNDLE_IDENTIFIER']}_appstore"]
       )
 
       # sh "pod repo update"
