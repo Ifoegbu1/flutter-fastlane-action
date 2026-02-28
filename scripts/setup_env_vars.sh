@@ -26,10 +26,14 @@ BUILD_ARGS_ANDROID=""
 BUILD_ARGS_IOS=""
 MATCH_GIT_BRANCH=""
 PLAY_STORE_WHATSNEW_DIRECTORY=""
-
+NUKEMATCH=""
 # Parse named parameters
 while [[ $# -gt 0 ]]; do
     case $1 in
+    --nuke-match)
+        NUKEMATCH="$2"
+        shift 2
+        ;;
     --ruby-version)
         RUBY_VERSION="$2"
         shift 2
@@ -141,7 +145,7 @@ echo "isPatch=$IS_PATCH" >>"$GITHUB_ENV"
 echo "rubyV=$RUBY_VERSION" >>"$GITHUB_ENV"
 echo "flutterV=$FLUTTER_VERSION" >>"$GITHUB_ENV"
 echo "flutterChannel=$FLUTTER_CHANNEL" >>"$GITHUB_ENV"
-
+echo "nukeMatch=$NUKEMATCH" >>"$GITHUB_ENV"
 # Do NOT write raw JSON to GITHUB_ENV (may contain newlines and break format)
 # Keep it only in the current process environment for secure parsing below
 export IOS_JSON

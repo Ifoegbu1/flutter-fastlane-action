@@ -38,6 +38,13 @@ platform :ios do
       key_content: ENV["APP_STORE_CONNECT_API_KEY_CONTENT"],
       is_key_content_base64: true
     )
+
+    if ENV["nukeMatch"] == "true"
+      match_nuke(type: "appstore")
+    end
+
+
+
     
     # Fetch certs & profiles for App Store distribution
     match(
@@ -61,9 +68,7 @@ platform :ios do
         team_id: ENV["TEAM_ID"],
         bundle_identifier: ENV["BUNDLE_IDENTIFIER"],
         profile_name:ENV["sigh_#{ENV['BUNDLE_IDENTIFIER']}_appstore_profile-name"],
-        code_sign_identity: "iPhone Distribution",
-        entitlements_file_path: "Runner/Runner.entitlements",
-        profile_uuid: ENV["sigh_#{ENV['BUNDLE_IDENTIFIER']}_appstore"]
+        code_sign_identity: "Apple Distribution"
       )
 
       # sh "pod repo update"
