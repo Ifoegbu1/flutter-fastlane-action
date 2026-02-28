@@ -40,7 +40,10 @@ platform :ios do
     )
 
     if ENV["nukeMatch"] == "true"
-      match_nuke(type: "appstore")
+      match_nuke(type: "appstore", 
+      platform: "ios",
+      skip_confirmation: true
+      )
     end
 
 
@@ -52,6 +55,8 @@ platform :ios do
       readonly: false,
       keychain_name: keychain_name,
       keychain_password: "#{keychain_name}-password"
+      platform: "ios"
+      skip_confirmation: true
     )
     
     # Update Xcode project with Match profiles
