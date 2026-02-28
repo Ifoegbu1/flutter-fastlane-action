@@ -118,7 +118,6 @@ platform :ios do
           )
         end
       else
-        sh "cd ../.."
             flutter_build(
         debug: true,
 
@@ -146,7 +145,12 @@ platform :ios do
         # sh build_cmd
       end
     
-      gym(silent: true, suppress_xcode_output: true)
+      gym(
+        workspace: "Runner.xcworkspace",
+        scheme: "Runner",
+        silent: true,
+        suppress_xcode_output: true
+      )
 
 
 
