@@ -57,7 +57,7 @@ platform :ios do
 
       # Update code signing settings
       update_code_signing_settings(
-        use_automatic_signing: false,
+        use_automatic_signing: true,
         team_id: ENV["TEAM_ID"],
         bundle_identifier: ENV["BUNDLE_IDENTIFIER"],
         profile_name:ENV["sigh_#{ENV['BUNDLE_IDENTIFIER']}_appstore_profile-name"],
