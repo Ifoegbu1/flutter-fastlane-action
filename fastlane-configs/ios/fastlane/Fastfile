@@ -118,6 +118,7 @@ platform :ios do
           )
         end
       else
+        sh "cd ../.."
             flutter_build(
         debug: true,
 
