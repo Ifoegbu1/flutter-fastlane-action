@@ -5,6 +5,7 @@ set -e
 IS_PATCH=""
 FLUTTER_VERSION=""
 FLUTTER_CHANNEL=""
+RUBY_VERSION=""
 BUILD_NAME=""
 BUILD_NUMBER=""
 IOS_JSON=""
@@ -29,6 +30,10 @@ PLAY_STORE_WHATSNEW_DIRECTORY=""
 # Parse named parameters
 while [[ $# -gt 0 ]]; do
     case $1 in
+    --ruby-version)
+        RUBY_VERSION="$2"
+        shift 2
+        ;;
     --is-patch)
         IS_PATCH="$2"
         shift 2
@@ -133,6 +138,7 @@ yaml_file="pubspec.yaml"
 # Set environment variables
 echo -e "\033[1;36mSetting up environment variables...\033[0m"
 echo "isPatch=$IS_PATCH" >>"$GITHUB_ENV"
+echo "rubyV=$RUBY_VERSION" >>"$GITHUB_ENV"
 echo "flutterV=$FLUTTER_VERSION" >>"$GITHUB_ENV"
 echo "flutterChannel=$FLUTTER_CHANNEL" >>"$GITHUB_ENV"
 

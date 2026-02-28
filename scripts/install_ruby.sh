@@ -2,7 +2,7 @@
 # Script to install Ruby with locking mechanism to prevent concurrent installations
 
 # Parse command line arguments
-RUBY_VERSION="3.1.2"
+RUBY_VERSION="$rubyV"
 INSTALL_BASE_DIR="${HOME}/.ruby-installations-local"
 
 # Display help
