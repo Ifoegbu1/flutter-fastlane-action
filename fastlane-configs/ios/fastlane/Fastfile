@@ -118,6 +118,7 @@ platform :ios do
           )
         end
       else
+         sh "echo \"🚀 Building with Flutter version: #{flutterV}\""
             flutter_build(
         debug: true,
 
@@ -126,7 +127,7 @@ platform :ios do
 
         build_args: (ENV["buildArgsIos"] || "").split,
       )
-        # sh "echo \"🚀 Building with Flutter version: #{flutterV}\""
+       
         # build_cmd = "cd ../.. && flutter build ipa --release"
         
         # # Add build-name and build-number if available
@@ -143,14 +144,15 @@ platform :ios do
         # end
         
         # sh build_cmd
+        gym(
+          workspace: "Runner.xcworkspace",
+          scheme: "Runner",
+          silent: true,
+          suppress_xcode_output: true
+        )
       end
     
-      gym(
-        workspace: "Runner.xcworkspace",
-        scheme: "Runner",
-        silent: true,
-        suppress_xcode_output: true
-      )
+
 
 
 
