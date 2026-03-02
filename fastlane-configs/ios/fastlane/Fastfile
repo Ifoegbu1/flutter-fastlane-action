@@ -182,8 +182,8 @@ platform :ios do
     # Upload to TestFlight
     if isPatch == "false"
       # Flutter outputs IPA to build/ios/ipa/ relative to project root
-      # Fastlane runs from workingDir/ios, so project root is one level up
-      ipa_dir = File.expand_path("../build/ios/ipa", Dir.pwd)
+      # Dir.pwd is ios/fastlane/, so project root is two levels up
+      ipa_dir = File.expand_path("../../build/ios/ipa", Dir.pwd)
       ipa_path = Dir["#{ipa_dir}/*.ipa"].first
       UI.user_error!("No IPA file found in #{ipa_dir}. Ensure flutter build ipa completed successfully.") unless ipa_path
       upload_to_testflight(
