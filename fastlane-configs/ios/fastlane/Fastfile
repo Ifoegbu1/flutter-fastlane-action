@@ -55,7 +55,7 @@ platform :ios do
       readonly: false,
       keychain_name: keychain_name,
       keychain_password: "#{keychain_name}-password",
-      platform: "ios",
+      # platform: "ios",
       skip_confirmation: true
     )
     
@@ -119,37 +119,60 @@ platform :ios do
         end
       else
          sh "echo \"🚀 Building with Flutter version: #{flutterV}\""
-            flutter_build(
-        debug: true,
+      #       flutter_build(
+      #   debug: true,
 
-        build_number: ENV["buildNumber"],
-        build_name: ENV["buildName"],
+      #   build_number: ENV["buildNumber"],
+      #   build_name: ENV["buildName"],
 
-        build_args: (ENV["buildArgsIos"] || "").split,
-      )
+      #   build_args: (ENV["buildArgsIos"] || "").split,
+      # )
        
-        # build_cmd = "cd ../.. && flutter build ipa --release"
+        # Generate ExportOptions.plist from match signing configuration
+        export_options_path = File.join(File.dirname(__FILE__), "ExportOptions.plist")
+        profile_name = ENV["sigh_#{ENV['BUNDLE_IDENTIFIER']}_appstore_profile-name"]
+        UI.user_error!("Provisioning profile name not found from match. Ensure match completed successfully.") unless profile_name
+        export_options_plist = <<~PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>app-store-connect</string>
+            <key>teamID</key>
+            <string>#{ENV['TEAM_ID']}</string>
+            <key>provisioningProfiles</key>
+            <dict>
+              <key>#{ENV['BUNDLE_IDENTIFIER']}</key>
+              <string>#{profile_name}</string>
+            </dict>
+          </dict>
+          </plist>
+        PLIST
+        File.write(export_options_path, export_options_plist)
         
-        # # Add build-name and build-number if available
-        # if ENV["buildName"]
-        #   build_cmd += " --build-name=#{ENV["buildName"]}"
-        # end
-        # if ENV["buildNumber"]
-        #   build_cmd += " --build-number=#{ENV["buildNumber"]}"
-        # end
+        build_cmd = "cd ../.. && flutter build ipa --release --export-options-plist=ios/fastlane/ExportOptions.plist"
         
-        # # Add additional build arguments if available
-        # if ENV["buildArgsIos"]
-        #   build_cmd += " #{ENV["buildArgsIos"]}"
-        # end
+        # Add build-name and build-number if available
+        if ENV["buildName"]
+          build_cmd += " --build-name=#{ENV["buildName"]}"
+        end
+        if ENV["buildNumber"]
+          build_cmd += " --build-number=#{ENV["buildNumber"]}"
+        end
         
-        # sh build_cmd
-        gym(
-          workspace: "Runner.xcworkspace",
-          scheme: "Runner",
-          silent: true,
-          suppress_xcode_output: true
-        )
+        # Add additional build arguments if available
+        if ENV["buildArgsIos"]
+          build_cmd += " #{ENV["buildArgsIos"]}"
+        end
+        
+        sh build_cmd
+        # gym(
+        #   workspace: "Runner.xcworkspace",
+        #   scheme: "Runner",
+        #   silent: true,
+        #   suppress_xcode_output: true
+        # )
       end
     
 
