@@ -50,33 +50,7 @@ Cache keys are automatically generated based on lock files (`pubspec.lock`, `Pod
 - App Store Connect API key and related configs as in IOS_DISTRIBUTION_JSON
 - Match repository for certificate management
 
-#### Fastlane and Match Setup
-
-> **IMPORTANT**: You only need to set up Fastlane locally if:
->
-> 1. It's your first time using Fastlane for this particular project
-> 2. You need to generate the MATCH_PASSWORD for your [iOS Distribution JSON](#ios-distribution-json-format)
->
-> **NOTE**: This action uses fastlane match for code signing, which is fastlane's recommended approach for managing iOS certificates and provisioning profiles. Match stores your signing files in a secure Git repository and manages them consistently across your team.
->
-> **NOTE**: You don't need to commit the ios/fastlane folder to your repository. This action will automatically handle the fastlane configuration for you.
-
-1. **Set up Fastlane in your iOS folder** (only needed once for initial setup):
-  ```bash
-   cd ios
-   fastlane init
-  ```
-   Follow the prompts to set up Fastlane. See the [Fastlane iOS Setup Guide](https://docs.fastlane.tools/getting-started/ios/setup/) for more details.
-2. **Set up Match for code signing**:
-  ```bash
-   fastlane match init
-  ```
-   When prompted, provide a private Git repository URL that will store your certificates and profiles.
-3. **Set a password for your Match repository**:
-  ```bash
-   fastlane match change_password
-  ```
-   Remember this password as you'll need to add it to your `IOS_DISTRIBUTION_JSON` as the `MATCH_PASSWORD`.
+#### Match Setup
 
 ### SSH Deploy Keys for Match Repository
 
@@ -84,7 +58,7 @@ To set up SSH deploy keys for your Match repository:
 
 1. Generate an SSH key pair (**do not set a passphrase**):
   ```bash
-   ssh-keygen -t ed25519 -C "your_email@example.com" -f ./match_deploy_key
+   ssh-keygen -t ed25519 -C "your_email@example.com" -f ./match_deploy_key -N ""
   ```
 2. Add the public key (`match_deploy_key.pub`) to your Match repository's deploy keys in GitHub
 3. Add the private key content to your `IOS_DISTRIBUTION_JSON` as the `MATCH_GIT_SSH_KEY`
