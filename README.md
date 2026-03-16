@@ -41,7 +41,6 @@ Cache keys are automatically generated based on lock files (`pubspec.lock`, `Pod
 ### General Requirements
 
 - Flutter project
-- Fastlane basic setup for ios
 - GitHub Actions workflow
 
 ### iOS Requirements
@@ -60,7 +59,8 @@ To set up SSH deploy keys for your Match repository:
   ```bash
    ssh-keygen -t ed25519 -C "your_email@example.com" -f ./match_deploy_key -N ""
   ```
-2. Add the public key (`match_deploy_key.pub`) to your Match repository's deploy keys in GitHub
+2. Add the public key (`match_deploy_key.pub`) to your Match repository's deploy keys in GitHub (Settings > Deploy keys > Add deploy key). Ensure you allow for write access
+
 3. Add the private key content to your `IOS_DISTRIBUTION_JSON` as the `MATCH_GIT_SSH_KEY`
 4. For more details, see [How to Use GitHub Deploy Keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys)
 
