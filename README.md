@@ -61,7 +61,7 @@ To set up SSH deploy keys for your Match repository:
   ```
 2. Add the public key (`match_deploy_key.pub`) to your Match repository's deploy keys in GitHub (Settings > Deploy keys > Add deploy key). Ensure you allow for write access
 
-3. Add the private key content to your `IOS_DISTRIBUTION_JSON` as the `MATCH_GIT_SSH_KEY`
+3. Add the private key content to your [`IOS_DISTRIBUTION_JSON`](#ios-distribution-json-format) as the `MATCH_GIT_SSH_KEY`
 4. For more details, see [How to Use GitHub Deploy Keys](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/managing-deploy-keys#deploy-keys)
 
 ### Android Requirements
