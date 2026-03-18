@@ -87,7 +87,7 @@ Name it `IOS_DISTRIBUTION_JSON` and paste the following structure, filled with y
 <br>
 
 - `TEAM_ID` & `APPLE_ID`: Your Apple Developer Team ID and Apple ID email.
-- `APP_STORE_CONNECT_API_*`: Generate an API key in App Store Connect -> Users and Access -> Keys. (Tip: Change real newlines in the key file to `\n` so it fits on one line in the JSON).
+- `APP_STORE_CONNECT_API_KEY_CONTENT`: Generate an API key in App Store Connect -> Users and Access -> Keys. (Tip: Change real newlines in the key file to `\n` so it fits on one line in the JSON).
 - `MATCH_SIGNING_GIT_URL`: A private Git repository to hold your Apple certificates. It must be an SSH URL (`git@github.com:username/repo.git`).
 - `MATCH_PASSWORD`: A password you choose to encrypt the certificates in your Match repo.
 - `MATCH_GIT_SSH_KEY`: A private SSH key that grants access to your Match repo. Generate it without a passphrase (`ssh-keygen -t ed25519 -C "email" -f ./key -N ""`), and add the `.pub` part as a **Deploy Key** in the Match repo's GitHub settings with **Write Access** enabled.
