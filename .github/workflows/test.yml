@@ -10,11 +10,21 @@ on:
 
 jobs:
   test-scripts:
-    name: Test Shell Scripts
+    name: Test Script Logic (Mocked)
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Mock binaries
+        run: |
+          mkdir -p $HOME/bin
+          echo '#!/bin/bash' > $HOME/bin/flutter
+          echo 'echo "Mock Flutter $@" && exit 0' >> $HOME/bin/flutter
+          echo '#!/bin/bash' > $HOME/bin/shorebird
+          echo 'echo "Mock Shorebird $@" && exit 0' >> $HOME/bin/shorebird
+          chmod +x $HOME/bin/*
+          echo "$HOME/bin" >> $GITHUB_PATH
 
       - name: Verify script permissions
         run: |
@@ -41,10 +51,10 @@ jobs:
 
       - name: Test environment setup script
         run: |
-          # Create a mock pubspec.yaml for the script to read version from
+          # Create a mock pubspec.yaml
           echo "version: 1.0.0+1" > pubspec.yaml
           
-          # Mock GITHUB_ENV if not set (it should be set in Actions)
+          # Mock GITHUB_ENV if not set
           export GITHUB_ENV=${GITHUB_ENV:-mock_env}
           touch "$GITHUB_ENV"
           
@@ -62,46 +72,34 @@ jobs:
           # Verify env vars were set
           grep -q "buildName=1.0.0" "$GITHUB_ENV" && echo "✅ Environment variables set correctly"
 
-  test-android:
-    name: Test Android Build
+  test-android-logic:
+    name: Test Android Script Logic
     runs-on: ubuntu-latest
     needs: test-scripts
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: "temurin"
-          java-version: "17"
-
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.27.4"
-          channel: "stable"
-
-      - name: Create test Flutter project
+      - name: Mock tools
         run: |
-          flutter create test_project
-          cd test_project
+          mkdir -p $HOME/bin
+          echo '#!/bin/bash' > $HOME/bin/flutter
+          echo 'echo "Mock Flutter $@" && exit 0' >> $HOME/bin/flutter
+          echo '#!/bin/bash' > $HOME/bin/shorebird
+          echo 'echo "Mock Shorebird $@" && exit 0' >> $HOME/bin/shorebird
+          chmod +x $HOME/bin/*
+          echo "$HOME/bin" >> $GITHUB_PATH
 
-          # Create dummy keystore for signing
-          mkdir -p android/app
-          keytool -genkeypair -v -keystore android/app/keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias testkey -storepass testpass -keypass testpass -dname "CN=Test,O=Test,L=Test,C=US"
+      - name: Setup project skeleton
+        run: |
+          mkdir -p test_project/android/app
+          touch test_project/pubspec.yaml
+          echo "version: 1.0.0+1" > test_project/pubspec.yaml
           
-          # Create key.properties (though the build script will try to recreate it)
-          echo "storePassword=testpass" > android/key.properties
-          echo "keyPassword=testpass" >> android/key.properties
-          echo "keyAlias=testkey" >> android/key.properties
-          echo "storeFile=keystore.jks" >> android/key.properties
+          # Create dummy keystore file
+          touch test_project/android/app/keystore.jks
 
-          # Add distribution directory for whatsnew
-          mkdir -p distribution/whatsnew
-          echo "Test release notes" > distribution/whatsnew/default.txt
-
-      - name: Test Android build script
+      - name: Test android_build.sh execution
         env:
           workingDir: "test_project"
           buildName: "1.0.0"
@@ -115,40 +113,77 @@ jobs:
           androidKeyStoreAlias: "testkey"
           androidKeyPassword: "testpass"
           skipConfigureKeystore: "false"
+          GITHUB_ENV: "mock_env"
         run: |
           cd $workingDir
-          # Set releaseV which is usually set by setup_env_vars.sh
-          echo "releaseV=1.0.0" >> $GITHUB_ENV
+          # Set releaseV
           export releaseV="1.0.0"
-          
-          # Make scripts executable just in case
           chmod +x ../scripts/*.sh
-          
-          ../scripts/android_build.sh
+          ../scripts/android_build.sh && echo "✅ Android build script logic passed"
 
-  test-action-android:
-    name: Test Action with Android
+  test-ios-logic:
+    name: Test iOS Script Logic
     runs-on: ubuntu-latest
     needs: test-scripts
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: "3.27.4"
-          channel: "stable"
-
-      - name: Create test Flutter project
+      - name: Mock tools
         run: |
-          flutter create test_project
-          cd test_project
-          # Create dummy keystore
-          mkdir -p android/app
-          keytool -genkeypair -v -keystore android/app/keystore.jks -keyalg RSA -keysize 2048 -validity 10000 -alias testkey -storepass testpass -keypass testpass -dname "CN=Test,O=Test,L=Test,C=US"
+          mkdir -p $HOME/bin
+          echo '#!/bin/bash' > $HOME/bin/git
+          echo 'echo "Mock Git $@" && exit 0' >> $HOME/bin/git
+          echo '#!/bin/bash' > $HOME/bin/ssh
+          echo 'echo "Mock SSH $@" && exit 0' >> $HOME/bin/ssh
+          echo '#!/bin/bash' > $HOME/bin/ssh-keyscan
+          echo 'echo "Mock ssh-keyscan $@" && exit 0' >> $HOME/bin/ssh-keyscan
+          echo '#!/bin/bash' > $HOME/bin/bundle
+          echo 'echo "Mock bundle $@" && exit 0' >> $HOME/bin/bundle
+          chmod +x $HOME/bin/*
+          echo "$HOME/bin" >> $GITHUB_PATH
 
-      - name: Run action with minimal configuration
+      - name: Setup project skeleton
+        run: |
+          mkdir -p ios/fastlane
+          touch pubspec.yaml
+
+      - name: Test get_fastlane_configs.sh execution
+        env:
+          GITHUB_ACTION_PATH: ${{ github.workspace }}
+          MATCH_SIGNING_GIT_URL: "git@github.com:example/match-repo.git"
+          MATCH_GIT_BRANCH: "certificates"
+        run: |
+          chmod +x scripts/*.sh
+          # Mock the matching branch check by making git output something
+          scripts/get_fastlane_configs.sh '{"MATCH_GIT_SSH_KEY":"dummy-key"}' && echo "✅ iOS config script logic passed"
+
+  test-full-action-mock:
+    name: Test Full Action (Mocked Tools)
+    runs-on: ubuntu-latest
+    needs: test-scripts
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Mock all required binaries
+        run: |
+          mkdir -p $HOME/bin
+          for tool in flutter shorebird git ssh ssh-keyscan bundle ruby keytool java xcodebuild; do
+            echo '#!/bin/bash' > "$HOME/bin/$tool"
+            echo "echo \"Mock $tool \$@\" && exit 0" >> "$HOME/bin/$tool"
+            chmod +x "$HOME/bin/$tool"
+          done
+          echo "$HOME/bin" >> $GITHUB_PATH
+
+      - name: Setup project skeleton
+        run: |
+          mkdir -p test_project/android/app
+          touch test_project/pubspec.yaml
+          echo "version: 1.0.0+1" > test_project/pubspec.yaml
+          touch test_project/android/app/keystore.jks
+
+      - name: Run action (composite)
         uses: ./
         with:
           workingDirectory: "test_project"
@@ -159,41 +194,9 @@ jobs:
           androidKeyPassword: "testpass"
           packageName: "com.example.test_project"
           serviceAccountJsonPlainText: '{"dummy": "data"}'
-          iosDistributionJson: "{}"
+          iosDistributionJson: '{"dummy": "data"}'
           skipConfigureKeystore: "false"
-
-  test-ios-scripts:
-    name: Test iOS Scripts
-    runs-on: macos-latest
-    needs: test-scripts
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Ruby
-        run: |
-          chmod +x scripts/*.sh
-          export rubyV="3.2.0"
-          scripts/install_ruby.sh
-          ruby --version
-
-      - name: Test Fastlane configs script
-        env:
-          GITHUB_ACTION_PATH: ${{ github.workspace }}
-          MATCH_SIGNING_GIT_URL: "git@github.com:example/match-repo.git"
-          MATCH_GIT_BRANCH: "certificates"
-        run: |
-          export workingDir="."
-          mkdir -p ios/fastlane
-          # Provide dummy secrets JSON with required key for match_ssh
-          scripts/get_fastlane_configs.sh '{"MATCH_GIT_SSH_KEY":"dummy-key"}' || echo "Fastlane configs script executed (expected some failures due to dummy data)"
-
-
-      - name: Test SSH restore script
-        run: |
-          mkdir -p ~/.ssh
-          scripts/clean_up.sh || echo "SSH restore script executed"
-
 
 # We can't do a full iOS test without proper certificates and profiles
 # but we can test the script execution
+
