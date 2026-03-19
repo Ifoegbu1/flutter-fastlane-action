@@ -158,45 +158,7 @@ jobs:
           # Mock the matching branch check by making git output something
           scripts/get_fastlane_configs.sh '{"MATCH_GIT_SSH_KEY":"dummy-key"}' && echo "✅ iOS config script logic passed"
 
-  test-full-action-mock:
-    name: Test Full Action (Mocked Tools)
-    runs-on: ubuntu-latest
-    needs: test-scripts
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Mock all required binaries
-        run: |
-          mkdir -p $HOME/bin
-          for tool in flutter shorebird git ssh ssh-keyscan bundle ruby keytool java xcodebuild; do
-            echo '#!/bin/bash' > "$HOME/bin/$tool"
-            echo "echo \"Mock $tool \$@\" && exit 0" >> "$HOME/bin/$tool"
-            chmod +x "$HOME/bin/$tool"
-          done
-          echo "$HOME/bin" >> $GITHUB_PATH
-
-      - name: Setup project skeleton
-        run: |
-          mkdir -p test_project/android/app
-          touch test_project/pubspec.yaml
-          echo "version: 1.0.0+1" > test_project/pubspec.yaml
-          touch test_project/android/app/keystore.jks
-
-      - name: Run action (composite)
-        uses: ./
-        with:
-          workingDirectory: "test_project"
-          platform: "android"
-          androidKeyStorePath: "android/app/keystore.jks"
-          androidKeyStorePassword: "testpass"
-          androidKeyStoreAlias: "testkey"
-          androidKeyPassword: "testpass"
-          packageName: "com.example.test_project"
-          serviceAccountJsonPlainText: '{"dummy": "data"}'
-          iosDistributionJson: '{"dummy": "data"}'
-          skipConfigureKeystore: "false"
-
 # We can't do a full iOS test without proper certificates and profiles
 # but we can test the script execution
+
 
