@@ -224,7 +224,12 @@ echo -e "\033[1;32m✅ Environment variables set successfully.\033[0m"
 echo ""
 echo -e "\033[1;34m📋 Summary:\033[0m"
 echo -e "\033[1;34m  - flutterVersion: $FLUTTER_VERSION\033[0m"
-echo -e "\033[1;34m  - releaseVersion: $releaseV\033[0m"
+if [[ -n "$BUILD_NAME" || -n "$BUILD_NUMBER" ]]; then
+    echo -e "\033[1;34m  - buildName: ${BUILD_NAME:-<from pubspec>}\033[0m"
+    echo -e "\033[1;34m  - buildNumber: ${BUILD_NUMBER:-<from pubspec>}\033[0m"
+else
+    echo -e "\033[1;34m  - releaseVersion: $releaseV\033[0m"
+fi
 echo -e "\033[1;34m  - platform: $PLATFORM\033[0m"
 echo -e "\033[1;34m  - isPatch: $IS_PATCH\033[0m"
 echo -e "\033[1;34m  - useShorebird: $USE_SHOREBIRD\033[0m"
