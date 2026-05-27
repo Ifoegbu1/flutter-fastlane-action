@@ -88,7 +88,7 @@ platform :ios do
         sh "echo \"🐦 Shorebird action initiated\""
         if isPatch == "true"
           sh "echo \"🎯 Shorebird Patch action initiated\""
-          patch_args = "--release-version #{releaseV} --allow-asset-diffs"
+          patch_args = "--release-version #{releaseV} --allow-asset-diffs --export-options-plist=/Users/builder/export_options.plist"
           
           # Add additional build arguments if available
         
