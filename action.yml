@@ -142,6 +142,10 @@ inputs:
     description: "Whether to nuke match"
     required: false
     default: "false"
+  podRepoUpdate:
+    description: "Whether to run pod repo update"
+    required: false
+    default: "false"
 runs:
   using: "composite"
   steps:
@@ -246,6 +250,13 @@ runs:
       working-directory: ${{ env.workingDir }}/ios
       run: |
         bundle install
+
+    - name: 📦 Update CocoaPods Repo
+      if: ${{ env.platform == 'ios' && inputs.podRepoUpdate == 'true' }}
+      shell: bash
+      working-directory: ${{ env.workingDir }}/ios
+      run: |
+        bundle exec pod repo update
 
     - name: 🐦 Setup Flutter
       shell: bash

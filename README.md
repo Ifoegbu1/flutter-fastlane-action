@@ -220,6 +220,22 @@ If you already manage `key.properties` yourself, you can skip our auto-config. T
 ```
 </details>
 
+<details>
+<summary><b>6. Run CocoaPods Repository Update (iOS)</b></summary>
+<br>
+
+If your iOS build requires the latest versions of CocoaPods dependencies that are not yet locally indexed in the environment, you can force a pod repository update:
+```yaml
+- uses: Ifoegbu1/flutter-fastlane-action@main
+  with:
+    platform: ios
+    bundleIdentifier: com.yourcompany.app
+    iosDistributionJson: ${{ secrets.IOS_DISTRIBUTION_JSON }}
+    podRepoUpdate: "true"
+```
+</details>
+
+
 ---
 
 ## 📄 Full Input Reference
@@ -245,6 +261,8 @@ If you already manage `key.properties` yourself, you can skip our auto-config. T
 | `xcodeVersion` | No | `latest-stable` | Xcode version to use |
 | `matchGitBranch` | No | `master` | Git branch for fastlane match |
 | `nukeMatch` | No | `false` | Set to `true` to revoke all Match certificates |
+| `podRepoUpdate` | No | `false` | Set to `true` to run `pod repo update` |
+
 
 ### 🤖 Android Specific
 | Parameter | Required | Default | Description |
