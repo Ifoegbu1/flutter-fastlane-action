@@ -27,11 +27,16 @@ BUILD_ARGS_IOS=""
 MATCH_GIT_BRANCH=""
 PLAY_STORE_WHATSNEW_DIRECTORY=""
 NUKEMATCH=""
+POD_REPO_UPDATE=""
 # Parse named parameters
 while [[ $# -gt 0 ]]; do
     case $1 in
     --nuke-match)
         NUKEMATCH="$2"
+        shift 2
+        ;;
+    --pod-repo-update)
+        POD_REPO_UPDATE="$2"
         shift 2
         ;;
     --ruby-version)
@@ -233,3 +238,7 @@ fi
 echo -e "\033[1;34m  - platform: $PLATFORM\033[0m"
 echo -e "\033[1;34m  - isPatch: $IS_PATCH\033[0m"
 echo -e "\033[1;34m  - useShorebird: $USE_SHOREBIRD\033[0m"
+if [[ "$POD_REPO_UPDATE" == "true" ]]; then
+    echo -e "\033[1;34m  - podRepoUpdate: $POD_REPO_UPDATE\033[0m"
+fi
+

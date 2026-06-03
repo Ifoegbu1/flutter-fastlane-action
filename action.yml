@@ -157,6 +157,7 @@ runs:
           --is-patch "${{ inputs.isPatch }}" \
           --ruby-version "${{ inputs.rubyVersion }}" \
           --nuke-match "${{ inputs.nukeMatch }}" \
+          --pod-repo-update "${{ inputs.podRepoUpdate }}" \
           --flutter-version "${{ inputs.flutterVersion }}" \
           --flutter-channel "${{ inputs.flutterChannel }}" \
           --build-name "${{ inputs.buildName }}" \
